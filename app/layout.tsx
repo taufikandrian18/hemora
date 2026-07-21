@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LoadingScreen } from "./loading-screen";
+import { PageTransition } from "./page-transition";
 
 export const metadata: Metadata = {
   title: "HEMORA — Lereng Senja Ciwidey & Sriti Palu",
@@ -18,7 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <LoadingScreen className="page-load-transition" />
+        <PageTransition />
+      </body>
     </html>
   );
 }

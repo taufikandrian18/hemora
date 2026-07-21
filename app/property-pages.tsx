@@ -2,55 +2,45 @@
 import Link from "next/link";
 import { menuSections, properties, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
 
+type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
+
+const heroStatIcons: HemoraIconName[] = ["bar", "dining", "spa", "ballroom"];
+
+function HemoraIcon({ name, className }: { name: HemoraIconName; className?: string }) {
+  return <span className={["hemora-icon", `hemora-icon-${name}`, className].filter(Boolean).join(" ")} aria-hidden="true" />;
+}
+
 function ArrowIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
+  return <HemoraIcon name="arrow-right" />;
 }
 
 function BackIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M19 12H6M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
+  return <HemoraIcon name="arrow-left" />;
 }
 
 function WhatsAppIcon() {
+  return <HemoraIcon name="phone" className="chat-mark" />;
+}
+
+function StatLabel({ label }: { label: string }) {
+  const [firstWord, ...rest] = label.split(" ");
+
   return (
-    <svg className="whatsapp-mark" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M5.2 18.8 6 15.9a7 7 0 1 1 2.4 2.2l-3.2.7Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.55" />
-      <path
-        d="M9.2 8.8c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.4.5c.5.9 1.2 1.6 2.2 2.1l.5-.5c.2-.2.4-.3.7-.2l1.5.7c.3.1.4.3.4.6v.4c0 .5-.5 1-1 1.1-2.9.4-6.9-3.1-6.5-6.4 0-.2 0-.3.1-.5Z"
-        fill="currentColor"
-      />
-    </svg>
+    <span>
+      {firstWord}
+      {rest.length > 0 ? (
+        <>
+          <br />
+          {rest.join(" ")}
+        </>
+      ) : null}
+    </span>
   );
 }
 
-function MountainIcon() {
+function BrandLockup({ compact = false, href = "/" }: { compact?: boolean; href?: string }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M3 18.5 8.8 8.2l3.4 5.4 2.5-3.6L21 18.5H3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.55" />
-      <path d="M8.8 8.2 11 12l1.2-2.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.55" />
-    </svg>
-  );
-}
-
-function AtriumIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-      <path d="M5 19V9.5C5 6.5 8.1 4 12 4s7 2.5 7 5.5V19" stroke="currentColor" strokeLinecap="round" strokeWidth="1.55" />
-      <path d="M9 19v-8.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5V19M4 19h16" stroke="currentColor" strokeLinecap="round" strokeWidth="1.55" />
-    </svg>
-  );
-}
-
-function BrandLockup({ compact = false }: { compact?: boolean }) {
-  return (
-    <Link className={compact ? "brand-lockup compact" : "brand-lockup"} href="/">
+    <Link className={compact ? "brand-lockup compact" : "brand-lockup"} href={href}>
       <img className="brand-logo" src="/assets/hemora/hemora-logo.png" alt="HEMORA" width={920} height={167} />
     </Link>
   );
@@ -62,7 +52,7 @@ function PropertyNav({ property, active }: { property: PropertyData; active?: Me
       <Link href="/" aria-label="Back to overview" className="back-link icon-only">
         <BackIcon />
       </Link>
-      <BrandLockup compact />
+      <BrandLockup compact href={`/${property.slug}`} />
       <nav className="desktop-menu" aria-label={`${property.shortTitle} menu`}>
         {menuSections.map((item) => (
           <Link key={item.slug} href={`/${property.slug}/${item.slug}`} className={item.slug === active ? "active" : undefined}>
@@ -75,11 +65,8 @@ function PropertyNav({ property, active }: { property: PropertyData; active?: Me
       </Link>
       <details className="mobile-menu">
         <summary aria-label={`Open ${property.shortTitle} menu`}>
-          <span className="hamburger-lines" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
+          <HemoraIcon name="menu" className="menu-mark" />
+          <HemoraIcon name="close" className="close-mark" />
         </summary>
         <nav className="mobile-menu-panel" aria-label={`${property.shortTitle} mobile menu`}>
           {menuSections.map((item) => (
@@ -150,7 +137,7 @@ function Footer({ property }: { property: PropertyData }) {
   return (
     <footer className="site-footer">
       <div>
-        <BrandLockup compact />
+        <BrandLockup compact href={`/${property.slug}`} />
         <p>{property.address}</p>
         <a href={`mailto:${property.email}`}>{property.email}</a>
         <a href={`tel:${property.phone.replaceAll(" ", "")}`}>{property.phone}</a>
@@ -171,8 +158,6 @@ function PropertyHero({ property }: { property: PropertyData }) {
     <section className="hero-stage">
       <img className="hero-image" src={property.heroImage} alt={property.heroAlt} />
       <div className="hero-tint" />
-      <div className="fog-curtain left" />
-      <div className="fog-curtain right" />
       <div className="hero-content">
         <div className="hero-topline">
           <p className="eyebrow">{property.heroKicker}</p>
@@ -191,11 +176,14 @@ function PropertyHero({ property }: { property: PropertyData }) {
               {property.primaryAction}
               <ArrowIcon />
             </a>
-            <div className="hero-stats" aria-label="Property highlights">
-              {property.stats.map((stat) => (
-                <div className="hero-stat" key={`${stat.value}-${stat.label}`}>
-                  <strong>{stat.value}</strong>
-                  <span>{stat.label}</span>
+            <div className="hero-stats hero-icon-stats" aria-label="Property highlights">
+              {property.stats.map((stat, index) => (
+                <div className="hero-stat icon-stat" key={`${stat.value}-${stat.label}`}>
+                  <div className="stat-value-row">
+                    <HemoraIcon name={heroStatIcons[index] ?? "bar"} className="hero-stat-icon" />
+                    <strong>{stat.value}</strong>
+                  </div>
+                  <StatLabel label={stat.label} />
                 </div>
               ))}
             </div>
@@ -221,10 +209,13 @@ function Intro({ property }: { property: PropertyData }) {
         <p className="lead-copy">{property.philosophyLead}</p>
         <p>{property.philosophyBody}</p>
         <div className="intro-stats">
-          {property.stats.map((stat) => (
-            <div key={stat.label}>
-              <strong>{stat.value}</strong>
-              <span>{stat.label}</span>
+          {property.stats.map((stat, index) => (
+            <div className="intro-stat icon-stat" key={stat.label}>
+              <div className="stat-value-row">
+                <HemoraIcon name={heroStatIcons[index] ?? "bar"} className="hero-stat-icon" />
+                <strong>{stat.value}</strong>
+              </div>
+              <StatLabel label={stat.label} />
             </div>
           ))}
         </div>
@@ -322,7 +313,7 @@ export function HomeSelector() {
         <div className="selector-actions" aria-label="Choose a HEMORA property">
           <Link className="selector-card" href="/lereng">
             <span className="selector-icon">
-              <MountainIcon />
+              <HemoraIcon name="leaf" />
             </span>
             <span>
               <strong>{properties.lereng.title}</strong>
@@ -332,7 +323,7 @@ export function HomeSelector() {
           </Link>
           <Link className="selector-card" href="/sriti">
             <span className="selector-icon">
-              <AtriumIcon />
+              <HemoraIcon name="sunrise" />
             </span>
             <span>
               <strong>{properties.sriti.title}</strong>

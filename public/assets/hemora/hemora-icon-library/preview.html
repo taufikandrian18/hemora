@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hemora — Icon Library</title>
+<style>
+  :root{
+    --green:#343F33; --neutral:#CFCDC9; --wood:#4E3626;
+    --ink:#494949; --mute:#8C857B; --grey:#9EA2A2; --paper:#FAFAF8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--green);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:64px 32px 96px}
+  header.hero{border-bottom:1px solid rgba(52,63,51,.15);padding-bottom:40px;margin-bottom:56px}
+  .brandline{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  .brandline svg{width:34px;height:34px}
+  .brandline .bn{font-weight:600;letter-spacing:.28em;font-size:13px}
+  h1{font-size:clamp(34px,6vw,58px);font-weight:600;letter-spacing:-.01em;line-height:1.02}
+  h1 em{font-style:normal;color:var(--mute)}
+  .sub{margin-top:20px;max-width:60ch;color:var(--ink);font-size:16px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .chip{border:1px solid rgba(52,63,51,.2);border-radius:999px;padding:7px 15px;font-size:12.5px;color:var(--green)}
+  .chip b{font-weight:600}
+  .swatches{display:flex;gap:0;margin-top:28px;border-radius:12px;overflow:hidden;max-width:520px;border:1px solid rgba(0,0,0,.06)}
+  .sw{flex:1;height:52px;display:flex;align-items:flex-end;padding:6px 8px;font-size:10px;letter-spacing:.02em}
+  section{margin-bottom:64px}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:26px;
+    border-bottom:1px solid rgba(52,63,51,.12);padding-bottom:14px}
+  .sec-head .num{font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;letter-spacing:.1em}
+  .sec-head h2{font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .sec-head .count{margin-left:auto;font-size:12.5px;color:var(--grey)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+  .card{background:#fff;border:1px solid rgba(52,63,51,.1);border-radius:14px;
+    padding:22px 16px 16px;display:flex;flex-direction:column;align-items:center;
+    text-align:center;transition:border-color .2s,transform .2s}
+  .card:hover{border-color:var(--green);transform:translateY(-2px)}
+  .ico{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .ico svg{width:30px;height:30px}
+  figcaption{display:flex;flex-direction:column;gap:3px}
+  .name{font-size:13px;font-weight:500}
+  code{font-size:11px;color:var(--grey);font-family:"SF Mono",ui-monospace,Menlo,monospace}
+  footer{border-top:1px solid rgba(52,63,51,.15);padding-top:28px;color:var(--ink);font-size:13px}
+  footer b{font-weight:600;color:var(--green)}
+</style></head>
+<body><div class="wrap">
+  <header class="hero">
+    <div class="brandline"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M4.4 9.3c4 1.6 11.2 1.6 15.2 0"/><path d="M4.4 14.7c4-1.6 11.2-1.6 15.2 0"/><path d="M4 12h6.2M13.8 12H20"/></svg>
+<span class="bn">HEMORA</span></div>
+    <h1>Icon Library <em>—</em> Website</h1>
+    <p class="sub">Set ikon garis untuk kebutuhan tim development website Hemora. Dirancang mengikuti brand guideline: bentuk bersih, sudut membulat, dan nuansa tenang yang mendukung tema <em>healing &amp; renewal</em>.</p>
+    <div class="meta">
+      <span class="chip"><b>39</b> ikon</span>
+      <span class="chip">Format <b>SVG</b> · stroke</span>
+      <span class="chip">Grid <b>24×24</b></span>
+      <span class="chip">Stroke <b>1.5</b> · round cap</span>
+      <span class="chip">Warna default <b>#343F33</b></span>
+    </div>
+    <div class="swatches">
+      <div class="sw" style="background:#CFCDC9;color:#343F33">#CFCDC9</div>
+      <div class="sw" style="background:#343F33;color:#fff">#343F33</div>
+      <div class="sw" style="background:#4E3626;color:#fff">#4E3626</div>
+      <div class="sw" style="background:#8C857B;color:#fff">#8C857B</div>
+      <div class="sw" style="background:#9EA2A2;color:#fff">#9EA2A2</div>
+    </div>
+  </header>
+  <section>
+      <div class="sec-head"><span class="num">01</span><h2>Fasilitas</h2><span class="count">14 icon</span></div>
+      <div class="grid"><figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><path d="M3 18V8"/><path d="M21 18v-2"/><path d="M7 12v-1.5A1.5 1.5 0 0 1 8.5 9h3A1.5 1.5 0 0 1 13 10.5V12"/></svg>
+</div>
+        <figcaption><span class="name">Kamar</span><code>bed.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 16c1.5 0 1.5 1.2 3 1.2S7 16 8.5 16s1.5 1.2 3 1.2S13 16 14.5 16s1.5 1.2 3 1.2S19 16 20.5 16"/><path d="M2.5 20c1.5 0 1.5 1.2 3 1.2S7 20 8.5 20s1.5 1.2 3 1.2S13 20 14.5 20s1.5 1.2 3 1.2S19 20 20.5 20"/><path d="M8.5 14V6a2 2 0 0 1 4 0"/><path d="M16 14V6a2 2 0 0 1 4 0"/><path d="M8.5 10H16"/></svg>
+</div>
+        <figcaption><span class="name">Kolam Renang</span><code>pool.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18"/><path d="M4 4v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4"/><path d="M12 14v3"/><path d="M9 20l3-3 3 3"/></svg>
+</div>
+        <figcaption><span class="name">Meeting Room</span><code>meeting.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3.5"/><path d="M6 11a6 6 0 0 1 12 0"/><path d="M6 11v1.5M12 11v2.5M18 11v1.5"/><path d="M6 14.5v.01M12 16.5v.01M18 14.5v.01"/><path d="M12 7v.01"/></svg>
+</div>
+        <figcaption><span class="name">Ballroom</span><code>ballroom.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v3.6M8 3v3.6M10 3v3.6"/><path d="M6 6.6c0 1.4.9 2.2 2 2.2s2-.8 2-2.2"/><path d="M8 8.8V21"/><path d="M16.5 3c-1.4 0-2.2 2.6-2.2 5.2 0 2 1.1 3 2.2 3v9.8"/></svg>
+</div>
+        <figcaption><span class="name">Restoran</span><code>dining.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13c1-2.5 1-6.5 0-9-1 2.5-1 6.5 0 9Z"/><path d="M12 13C10 12 7.6 10.5 6.6 7c2.8.3 4.5 2 5.4 6Z"/><path d="M12 13c2-1 4.4-2.5 5.4-6-2.8.3-4.5 2-5.4 6Z"/><path d="M4 15.5c2.4 2 5 3 8 3s5.6-1 8-3"/></svg>
+</div>
+        <figcaption><span class="name">Spa</span><code>spa.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M7 6.5v11M17 6.5v11M20 9v6M7 12h10"/></svg>
+</div>
+        <figcaption><span class="name">Gym</span><code>fitness.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8 15.5a6 6 0 0 1 8 0"/><path d="M10.5 18.5a2.5 2.5 0 0 1 3 0"/><path d="M12 20.5h.01"/></svg>
+</div>
+        <figcaption><span class="name">Wi-Fi</span><code>wifi.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M9.5 16.5V7.5h3.2a2.75 2.75 0 0 1 0 5.5H9.5"/></svg>
+</div>
+        <figcaption><span class="name">Parkir</span><code>parking.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16"/><path d="M6 18a6 6 0 0 1 12 0"/><path d="M12 9.5V11"/><path d="M12 8.5h.01"/></svg>
+</div>
+        <figcaption><span class="name">Room Service</span><code>room-service.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-1 5a3 3 0 0 1-6 0Z"/><path d="M12 13v6"/><path d="M9 21h6"/></svg>
+</div>
+        <figcaption><span class="name">Bar & Lounge</span><code>bar.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18"/><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 8.5V7"/><path d="M10.2 7h3.6"/></svg>
+</div>
+        <figcaption><span class="name">Resepsionis</span><code>reception.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="7" rx="1.8"/><path d="M6 9h8"/><path d="M7 15c0 1.5 1 1.5 1 3M11.5 15c0 1.5 1 1.5 1 3M16 15c0 1.5 1 1.5 1 3"/></svg>
+</div>
+        <figcaption><span class="name">Pendingin Udara</span><code>ac.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="13.5" r="4"/><circle cx="12" cy="13.5" r="1.4"/><path d="M8 6.5h.01M10.5 6.5h.01"/></svg>
+</div>
+        <figcaption><span class="name">Laundry</span><code>laundry.svg</code></figcaption>
+      </figure></div>
+    </section><section>
+      <div class="sec-head"><span class="num">02</span><h2>Booking & Kontak</h2><span class="count">7 icon</span></div>
+      <div class="grid"><figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18"/><path d="M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></svg>
+</div>
+        <figcaption><span class="name">Reservasi</span><code>calendar.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4-4 6-7.5 6-10.5A6 6 0 0 0 6 10.5c0 3 2 6.5 6 10.5Z"/><circle cx="12" cy="10.5" r="2.3"/></svg>
+</div>
+        <figcaption><span class="name">Lokasi</span><code>location.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.5 4.2L8.2 10a11 11 0 0 0 5.8 5.8l1.8-1.8 4.2 1.5V19a1.5 1.5 0 0 1-1.6 1.5A15.5 15.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4Z"/></svg>
+</div>
+        <figcaption><span class="name">Telepon</span><code>phone.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4.5 7.5 12 13l7.5-5.5"/></svg>
+</div>
+        <figcaption><span class="name">Email</span><code>email.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>
+</div>
+        <figcaption><span class="name">Check-in / Check-out</span><code>clock.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c0-4 3.4-6 7.5-6s7.5 2 7.5 6"/></svg>
+</div>
+        <figcaption><span class="name">Tamu</span><code>user.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3"/><path d="M15.5 7.5l3 3M17.5 5.5l2.5 2.5"/></svg>
+</div>
+        <figcaption><span class="name">Akses Kamar</span><code>key.svg</code></figcaption>
+      </figure></div>
+    </section><section>
+      <div class="sec-head"><span class="num">03</span><h2>UI & Navigasi</h2><span class="count">12 icon</span></div>
+      <div class="grid"><figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+</div>
+        <figcaption><span class="name">Menu</span><code>menu.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+</div>
+        <figcaption><span class="name">Tutup</span><code>close.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/></svg>
+</div>
+        <figcaption><span class="name">Cari</span><code>search.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+</div>
+        <figcaption><span class="name">Panah Kanan</span><code>arrow-right.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M10 6l-6 6 6 6"/></svg>
+</div>
+        <figcaption><span class="name">Panah Kiri</span><code>arrow-left.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+</div>
+        <figcaption><span class="name">Chevron Bawah</span><code>chevron-down.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+</div>
+        <figcaption><span class="name">Chevron Atas</span><code>chevron-up.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.15 1 5.85L12 17l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9Z"/></svg>
+</div>
+        <figcaption><span class="name">Rating</span><code>star.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20S3.75 15 3.75 9.4A4.35 4.35 0 0 1 12 7.2a4.35 4.35 0 0 1 8.25 2.2C20.25 15 12 20 12 20Z"/></svg>
+</div>
+        <figcaption><span class="name">Favorit</span><code>heart.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+</div>
+        <figcaption><span class="name">Tersedia</span><code>check.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+</div>
+        <figcaption><span class="name">Tambah</span><code>plus.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2.5 2.6 2.5 13 0 16-2.5-3-2.5-13.4 0-16Z"/></svg>
+</div>
+        <figcaption><span class="name">Bahasa</span><code>globe.svg</code></figcaption>
+      </figure></div>
+    </section><section>
+      <div class="sec-head"><span class="num">04</span><h2>Brand / Healing</h2><span class="count">6 icon</span></div>
+      <div class="grid"><figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M4.4 9.3c4 1.6 11.2 1.6 15.2 0"/><path d="M4.4 14.7c4-1.6 11.2-1.6 15.2 0"/><path d="M4 12h6.2M13.8 12H20"/></svg>
+</div>
+        <figcaption><span class="name">Hemora Mark</span><code>hemora-mark.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M10 9v6M14 9v6"/></svg>
+</div>
+        <figcaption><span class="name">Pause / Waktu</span><code>pause-time.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M5.6 6.6 7 8M18.4 6.6 17 8"/><path d="M8 15a4 4 0 0 1 8 0"/><path d="M3 19h4M17 19h4M9.5 19h5M3 15h1.5M19.5 15H21"/></svg>
+</div>
+        <figcaption><span class="name">Dawn / Renewal</span><code>sunrise.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/><path d="M9 14a3 3 0 0 0 3 3"/></svg>
+</div>
+        <figcaption><span class="name">Restore</span><code>waterdrop.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7.5 7.5 0 0 1 9.6 6C15 5 16.8 4.4 19 2c1.2 2.2 2 4.6 2 8 0 5.6-4.5 10-10 10Z"/><path d="M3.5 20.5c0-3.5 3.5-8 7-10"/></svg>
+</div>
+        <figcaption><span class="name">Nature / Wellbeing</span><code>leaf.svg</code></figcaption>
+      </figure>
+<figure class="card">
+        <div class="ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#343F33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 11V5.2a1.25 1.25 0 0 1 2.5 0V10.5"/><path d="M11 10.5V4.2a1.25 1.25 0 0 1 2.5 0v6.3"/><path d="M13.5 10.8V5.5a1.25 1.25 0 0 1 2.5 0V13"/><path d="M8.5 11V9a1.25 1.25 0 0 0-2.5 0v4.5c0 3.7 2.5 6.5 6.25 6.5S18.5 17.4 18.5 13.6V12"/></svg>
+</div>
+        <figcaption><span class="name">Healing Touch</span><code>hands.svg</code></figcaption>
+      </figure></div>
+    </section>
+  <footer>Hemora by Mora Group · Icon Library <b>v1.0</b> — 2025. Warna, ketebalan garis, dan ukuran dapat disesuaikan lewat atribut <code>stroke</code> / <code>stroke-width</code> pada tiap file SVG.</footer>
+</div></body></html>
