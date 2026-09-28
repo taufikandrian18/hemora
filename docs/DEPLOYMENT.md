@@ -35,6 +35,7 @@ WP_URL=https://website.taufikandrian.my.id/hemora
 WP_DB_PASSWORD=$(openssl rand -hex 24)
 WP_DB_ROOT_PASSWORD=$(openssl rand -hex 24)
 EOF
+grep -q '^REVALIDATE_SECRET=' .env || echo "REVALIDATE_SECRET=$(openssl rand -hex 24)" >> .env
 chmod 600 .env
 ```
 
@@ -76,7 +77,8 @@ ssh-copy-id -i ~/.ssh/hemora_deploy.pub ubuntu@<SERVER_IP>
 ## 4. Deploy
 
 Merge to `main` (or **Actions → Deploy → Run workflow**). The deploy job refuses to run until
-`PROXY_NETWORK`, `WP_URL`, `WP_DB_PASSWORD` and `WP_DB_ROOT_PASSWORD` exist in `/opt/hemora/.env`.
+`PROXY_NETWORK`, `WP_URL`, `WP_DB_PASSWORD`, `WP_DB_ROOT_PASSWORD` and `REVALIDATE_SECRET` exist in
+`/opt/hemora/.env`.
 The first run also starts WordPress and MariaDB.
 
 ## 5. Install WordPress (once, right after the first deploy)
@@ -96,6 +98,29 @@ docker compose run --rm wpcli wp rewrite structure '/%postname%/'
 ```
 
 Then sign in at https://website.taufikandrian.my.id/hemora/wp-admin.
+
+## 6. Content management (once, after WordPress is installed)
+
+```bash
+cd /opt/hemora
+docker compose run --rm wpcli wp plugin install advanced-custom-fields --activate
+docker compose run --rm wpcli wp hemora seed --source=http://hemora-web:3000/hemora/api/content/defaults
+```
+
+This creates **HEMORA Properties → Lereng Senja / Sriti Palu** in wp-admin and pre-fills every field
+(text, offers, chapters, contact) with the live copy; images and videos are imported into the Media
+Library (takes a minute or two). `--force` re-imports over existing entries.
+
+How it works:
+
+- Content model: `deploy/wordpress/mu-plugins/hemora-content.php` (must-use plugin, versioned here,
+  mounted read-only). Fields are grouped in tabs: Hero & home, Story, Offers, Stay, Dining, Wellness,
+  Journal, Guest note & booking, Contact.
+- The site reads `/wp/v2/hemora-properties` over the internal Docker network (`app/cms.ts`).
+  **An empty field falls back to the built-in copy**, and if WordPress is down the site keeps serving
+  the built-in content.
+- Saving a property calls `/hemora/api/revalidate` (shared `REVALIDATE_SECRET`) and re-visits the
+  pages, so the change is live within seconds; pages also refresh on their own every 5 minutes.
 
 ## Operations
 

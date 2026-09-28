@@ -1,7 +1,13 @@
 /* eslint-disable @next/next/no-img-element -- Vinext dev does not provide ASSETS for local image optimization. */
 import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
-import { bookingBaseUrl, getSiblingProperty, menuSections, properties, propertySlugs, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
+import { bookingBaseUrl, menuSections, propertySlugs, type MenuSlug, type PropertyData, type PropertySection, type PropertySlug } from "./property-data";
+
+export type PropertyCollection = Record<PropertySlug, PropertyData>;
+
+function siblingOf(property: PropertyData, collection: PropertyCollection) {
+  return collection[property.slug === "lereng" ? "sriti" : "lereng"];
+}
 import { BookingForm, LocalTime, SliderControls } from "./motion";
 import { asset } from "./base-path";
 
@@ -107,8 +113,8 @@ function BrandLockup({ compact = false, href = "/" }: { compact?: boolean; href?
   );
 }
 
-function PropertyNav({ property, active }: { property: PropertyData; active?: MenuSlug }) {
-  const sibling = getSiblingProperty(property);
+function PropertyNav({ property, collection, active }: { property: PropertyData; collection: PropertyCollection; active?: MenuSlug }) {
+  const sibling = siblingOf(property, collection);
 
   return (
     <header className="property-nav">
@@ -200,7 +206,7 @@ function Wordmark({ className }: { className?: string }) {
   );
 }
 
-function Footer({ property }: { property: PropertyData }) {
+function Footer({ property, collection }: { property: PropertyData; collection: PropertyCollection }) {
   return (
     <footer className="site-footer">
       <div className="grain-layer" />
@@ -238,7 +244,7 @@ function Footer({ property }: { property: PropertyData }) {
         <div className="footer-col footer-collection">
           <p className="eyebrow">The collection</p>
           {propertySlugs.map((slug) => {
-            const item = properties[slug];
+            const item = collection[slug];
             const current = slug === property.slug;
             return (
               <Link key={slug} href={`/${slug}`} className={current ? "collection-link current" : "collection-link"} aria-current={current ? "page" : undefined}>
@@ -442,8 +448,8 @@ function QuoteBand({ property }: { property: PropertyData }) {
   );
 }
 
-export function HomeSelector() {
-  const panels = [properties.lereng, properties.sriti];
+export function HomeSelector({ collection }: { collection: PropertyCollection }) {
+  const panels = [collection.lereng, collection.sriti];
 
   return (
     <main className="selector-shell">
@@ -490,10 +496,10 @@ export function HomeSelector() {
   );
 }
 
-export function PropertyLandingPage({ property }: { property: PropertyData }) {
+export function PropertyLandingPage({ property, collection }: { property: PropertyData; collection: PropertyCollection }) {
   return (
     <main className={`property-page property-page-${property.slug}`}>
-      <PropertyNav property={property} />
+      <PropertyNav property={property} collection={collection} />
       <PropertyHero property={property} />
       <Intro property={property} />
       <Offers property={property} />
@@ -502,19 +508,19 @@ export function PropertyLandingPage({ property }: { property: PropertyData }) {
       ))}
       <QuoteBand property={property} />
       <BookingCta property={property} />
-      <Footer property={property} />
+      <Footer property={property} collection={collection} />
       <WhatsAppWidget property={property} />
     </main>
   );
 }
 
-export function PropertyMenuPage({ property, section }: { property: PropertyData; section: PropertySection }) {
+export function PropertyMenuPage({ property, section, collection }: { property: PropertyData; section: PropertySection; collection: PropertyCollection }) {
   const position = menuSections.findIndex((item) => item.slug === section.slug);
   const next = property.sections[menuSections[(position + 1) % menuSections.length].slug];
 
   return (
     <main className={`menu-page property-page-${property.slug}`}>
-      <PropertyNav property={property} active={section.slug} />
+      <PropertyNav property={property} collection={collection} active={section.slug} />
       <section className="menu-hero" id="top">
         <img src={section.image} alt={section.alt} />
         <div className="hero-tint" />
@@ -569,7 +575,7 @@ export function PropertyMenuPage({ property, section }: { property: PropertyData
         <small>{next.title}</small>
       </Link>
       <BookingCta property={property} />
-      <Footer property={property} />
+      <Footer property={property} collection={collection} />
       <WhatsAppWidget property={property} />
     </main>
   );
