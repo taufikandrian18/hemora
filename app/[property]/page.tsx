@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { getProperty, propertySlugs } from "../property-data";
 import { PropertyLandingPage } from "../property-pages";
 
+// Every property/section is known at build time; anything else is a real 404.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return propertySlugs.map((property) => ({ property }));
 }

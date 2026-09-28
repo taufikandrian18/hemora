@@ -1,0 +1,14 @@
+.git
+.github
+.next
+.vercel
+.wrangler
+.agents
+node_modules
+dist
+docs
+tests
+deploy
+*.log
+.env*
+tsconfig.tsbuildinfo
