@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# One-time server setup for HEMORA on Ubuntu 22.04/24.04. Safe to re-run.
+# One-time server setup for HEMORA on Ubuntu 22.04/24.04. Safe to re-run, and safe on a
+# server that already hosts other projects: it never overwrites existing Docker config,
+# never restarts Docker while containers are running, and never turns on a firewall that is off.
 # Usage (on the server, as the ubuntu user):  bash bootstrap-server.sh
 set -euo pipefail
 
@@ -25,10 +27,16 @@ sudo systemctl enable --now docker
 sudo usermod -aG docker "$DEPLOY_USER"
 
 echo "==> Log rotation for containers"
-sudo tee /etc/docker/daemon.json >/dev/null <<'JSON'
+if [ -f /etc/docker/daemon.json ]; then
+  echo "    /etc/docker/daemon.json already exists - left untouched (HEMORA's compose file sets its own log limits)."
+elif [ -n "$(sudo docker ps -q)" ]; then
+  echo "    Other containers are running - not restarting Docker (HEMORA's compose file sets its own log limits)."
+else
+  sudo tee /etc/docker/daemon.json >/dev/null <<'JSON'
 { "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
 JSON
-sudo systemctl restart docker
+  sudo systemctl restart docker
+fi
 
 echo "==> Swap (2 GB) if the machine has none"
 if ! swapon --show | grep -q .; then
@@ -39,12 +47,16 @@ if ! swapon --show | grep -q .; then
   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab >/dev/null
 fi
 
-echo "==> Firewall: SSH, HTTP, HTTPS"
-sudo ufw allow OpenSSH
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 443/udp
-sudo ufw --force enable
+echo "==> Firewall"
+if sudo ufw status | grep -q "Status: active"; then
+  sudo ufw allow OpenSSH
+  sudo ufw allow 80/tcp
+  sudo ufw allow 443/tcp
+  sudo ufw allow 443/udp
+else
+  echo "    ufw is inactive - leaving it off so other services on this server keep their ports."
+  echo "    The cloud security group still controls inbound traffic."
+fi
 
 echo "==> Automatic security updates"
 sudo dpkg-reconfigure -f noninteractive unattended-upgrades
