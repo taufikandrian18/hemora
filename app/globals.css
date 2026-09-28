@@ -2357,6 +2357,206 @@ figure {
   transform: translateX(0.3em) rotate(-45deg);
 }
 
+/* ---------- 404 ---------- */
+
+.notfound-shell {
+  background: var(--color-night);
+  color: var(--color-ivory);
+  min-height: 100svh;
+  padding: 0.75rem;
+}
+
+.notfound-frame {
+  border-radius: 1.75rem;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  isolation: isolate;
+  min-height: calc(100svh - 1.5rem);
+  overflow: hidden;
+  padding: clamp(1.1rem, 2.6vw, 2rem) clamp(1.4rem, 3.2vw, 3rem);
+  position: relative;
+}
+
+.notfound-media,
+.notfound-tint {
+  inset: 0;
+  position: absolute;
+}
+
+.notfound-media {
+  animation: kenburns 18s ease-out forwards;
+  filter: grayscale(0.35) brightness(0.62);
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  width: 100%;
+  z-index: -2;
+}
+
+.notfound-tint {
+  background:
+    radial-gradient(ellipse at 50% 46%, rgb(18 22 18 / 0.2), rgb(18 22 18 / 0.72) 72%),
+    linear-gradient(180deg, rgb(18 22 18 / 0.55), transparent 30%, transparent 62%, rgb(18 22 18 / 0.85));
+  z-index: -1;
+}
+
+.notfound-frame > .grain-layer {
+  z-index: -1;
+}
+
+.notfound-bar,
+.notfound-rail {
+  align-items: center;
+  animation: fadeRise 1s var(--ease-out) both;
+  animation-delay: var(--intro-delay);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.notfound-bar {
+  border-bottom: 1px solid rgb(236 230 218 / 0.2);
+  padding-bottom: 1rem;
+}
+
+.notfound-body {
+  align-content: center;
+  display: grid;
+  justify-items: center;
+  padding: clamp(1.5rem, 4vh, 3rem) 0;
+  text-align: center;
+}
+
+.notfound-code {
+  align-items: center;
+  display: flex;
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 21vw, 19rem);
+  font-weight: 100;
+  gap: 0.06em;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+  margin: 0;
+}
+
+.notfound-glyph {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.notfound-glyph .letter {
+  animation: letterRise 1.25s var(--ease-out) both;
+  animation-delay: calc(var(--intro-delay) + var(--i, 0) * 90ms);
+  display: inline-flex;
+}
+
+/* Sized to the numerals' height (the footer wordmark sizes it to capitals). */
+.notfound-code .type-wordmark-mark {
+  color: var(--color-gold);
+  height: 0.74em;
+  width: 0.74em;
+}
+
+.notfound-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.2vw, 2.9rem);
+  font-weight: var(--display-weight-text);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin: clamp(1rem, 2.4vh, 1.8rem) 0 0;
+  text-shadow: 0 1px 18px rgb(18 22 18 / 0.55);
+  text-wrap: balance;
+}
+
+.notfound-title em {
+  color: var(--color-gold);
+  font-style: normal;
+}
+
+.notfound-lead {
+  animation: fadeRise 1s var(--ease-out) both;
+  animation-delay: calc(var(--intro-delay) + 0.6s);
+  color: rgb(236 230 218 / 0.78);
+  font-size: clamp(0.94rem, 1.2vw, 1.05rem);
+  line-height: 1.7;
+  margin: 1rem 0 0;
+  max-width: 34rem;
+}
+
+.notfound-actions {
+  align-items: center;
+  animation: fadeRise 1s var(--ease-out) both;
+  animation-delay: calc(var(--intro-delay) + 0.8s);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: clamp(1.6rem, 3.5vh, 2.4rem);
+}
+
+.notfound-property {
+  align-items: center;
+  border: 1px solid rgb(236 230 218 / 0.32);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 1rem;
+  min-height: 3.2rem;
+  padding: 0.45rem 1.1rem 0.45rem 1.4rem;
+  text-align: left;
+  transition:
+    background-color 400ms var(--ease-out),
+    border-color 400ms var(--ease-out);
+}
+
+.notfound-property strong,
+.notfound-property small {
+  display: block;
+}
+
+.notfound-property strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: var(--display-weight-text);
+  line-height: 1.1;
+}
+
+.notfound-property small {
+  color: rgb(236 230 218 / 0.55);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+}
+
+.notfound-property .hemora-icon {
+  height: 1rem;
+  transition: transform 500ms var(--ease-out);
+  width: 1rem;
+}
+
+.notfound-property:hover {
+  background: rgb(236 230 218 / 0.1);
+  border-color: rgb(236 230 218 / 0.6);
+}
+
+.notfound-property:hover .hemora-icon {
+  transform: rotate(-45deg);
+}
+
+.notfound-rail {
+  border-top: 1px solid rgb(236 230 218 / 0.14);
+  color: rgb(236 230 218 / 0.55);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  padding-top: 1rem;
+  text-transform: uppercase;
+}
+
+.notfound-rail a:hover {
+  color: var(--color-ivory);
+}
+
 /* Montserrat Thin is reserved for large display sizes; smaller headings step up a weight. */
 .offer-card h3,
 .chapter-card h2,
@@ -2750,6 +2950,42 @@ figure {
   .pill-cta {
     justify-content: space-between;
     width: 100%;
+  }
+
+  .notfound-shell {
+    padding: 0.5rem;
+  }
+
+  .notfound-frame {
+    border-radius: 1.25rem;
+    min-height: calc(100svh - 1rem);
+    padding: 1rem 1.1rem;
+  }
+
+  .notfound-bar .eyebrow {
+    font-size: 0.56rem;
+    letter-spacing: 0.14em;
+  }
+
+  .notfound-code {
+    font-size: 38vw;
+  }
+
+  .notfound-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .notfound-property {
+    justify-content: space-between;
+  }
+
+  .notfound-rail {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+    letter-spacing: 0.12em;
   }
 
   .menu-hero h1 {

@@ -231,6 +231,22 @@ test("exposes built-in content for the WordPress import and guards the refresh h
   assert.match(plugin, /WP_CLI::add_command\('hemora seed'/);
 });
 
+test("answers unknown URLs with a real 404 and ships the branded not-found page", async () => {
+  for (const path of ["/nope", "/lereng/nope"]) {
+    const response = await render(path);
+    assert.equal(response.status, 404, `${path} should be a 404`);
+  }
+
+  // vinext (this test build) answers dynamicParams=false misses with plain text; the production
+  // Next.js server renders app/not-found.tsx. Guard the page wiring at source level here.
+  const notFound = await readFile(new URL("../app/not-found.tsx", import.meta.url), "utf8");
+  const pages = await readFile(new URL("../app/property-pages.tsx", import.meta.url), "utf8");
+  assert.match(notFound, /<NotFoundPage collection=\{collection\} \/>/);
+  assert.match(pages, /export function NotFoundPage/);
+  assert.match(pages, /className="notfound-shell"/);
+  assert.match(pages, /Back to HEMORA/);
+});
+
 test("keeps the HEMORA brand palette and direct local assets", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
