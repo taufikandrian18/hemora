@@ -64,9 +64,7 @@ sudo dpkg-reconfigure -f noninteractive unattended-upgrades
 echo "==> App directory $APP_DIR"
 sudo mkdir -p "$APP_DIR"
 sudo chown "$DEPLOY_USER":"$DEPLOY_USER" "$APP_DIR"
-if [ ! -f "$APP_DIR/.env" ]; then
-  printf 'SITE_ADDRESS=:80\n' > "$APP_DIR/.env"
-fi
+touch "$APP_DIR/.env"
 
 echo
 echo "Done. Log out and back in (or run 'newgrp docker') so '$DEPLOY_USER' can use docker without sudo."

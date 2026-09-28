@@ -1,5 +1,10 @@
-# Production stack on the server (/opt/hemora). The deploy workflow copies this file
-# and the Caddyfile to the server, then runs `docker compose pull web && docker compose up -d`.
+# HEMORA production service (/opt/hemora on the server).
+#
+# The server already runs a shared Caddy reverse proxy (n8n-caddy-1) that owns ports 80/443,
+# so this stack publishes no ports. The web container joins that proxy's Docker network
+# (PROXY_NETWORK in /opt/hemora/.env) under the alias "hemora-web", and the proxy's
+# Caddyfile routes the site to hemora-web:3000 (see deploy/Caddyfile.site and
+# deploy/attach-to-proxy.sh).
 name: hemora
 
 services:
@@ -12,6 +17,11 @@ services:
       HOSTNAME: 0.0.0.0
     expose:
       - "3000"
+    networks:
+      proxy:
+        aliases:
+          - hemora-web
+    mem_limit: 384m
     logging:
       driver: json-file
       options:
@@ -24,24 +34,7 @@ services:
       start_period: 20s
       retries: 3
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    depends_on:
-      - web
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    environment:
-      # ":80" serves plain HTTP on the IP. Set a domain (e.g. "hemora.id, www.hemora.id")
-      # in /opt/hemora/.env and Caddy obtains HTTPS certificates automatically.
-      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-
-volumes:
-  caddy_data:
-  caddy_config:
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?Set PROXY_NETWORK in /opt/hemora/.env (run deploy/attach-to-proxy.sh)}

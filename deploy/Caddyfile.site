@@ -1,0 +1,24 @@
+# HEMORA site block for the shared Caddy proxy. attach-to-proxy.sh appends this to the
+# proxy's Caddyfile with __SITE_ADDRESS__ replaced (e.g. "hemora.id, www.hemora.id").
+# BEGIN HEMORA
+__SITE_ADDRESS__ {
+	encode zstd gzip
+
+	# Next.js build output is content-hashed, so it can be cached forever.
+	@hemora_hashed path /_next/static/*
+	header @hemora_hashed >Cache-Control "public, max-age=31536000, immutable"
+
+	# Public assets keep their filenames when replaced, so cache them for a week only.
+	@hemora_assets path /assets/* /favicon.png /favicon.svg
+	header @hemora_assets >Cache-Control "public, max-age=604800"
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	reverse_proxy hemora-web:3000
+}
+# END HEMORA

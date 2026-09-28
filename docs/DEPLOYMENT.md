@@ -1,23 +1,26 @@
 # Deploying HEMORA
 
-Production runs on a single Ubuntu server with Docker:
+Production runs on a shared Ubuntu server with Docker. Ports 80/443 there belong to an
+existing Caddy container (`n8n-caddy-1`) that fronts several sites, so HEMORA publishes no
+ports: its container joins that proxy's Docker network and the proxy routes the HEMORA
+domain to it.
 
 ```
 GitHub push to main
   └─ Actions: lint + typecheck + tests
       └─ build Docker image → ghcr.io/taufikandrian18/hemora:sha-<commit> (+ :latest)
           └─ SSH to server → /opt/hemora: docker compose pull web && up -d → health check
-Server: Caddy (:80/:443, automatic HTTPS) → web (Next.js standalone, :3000)
+Server: n8n-caddy-1 (:80/:443, automatic HTTPS) → hemora-web:3000 (Next.js standalone)
 ```
 
-Files: `Dockerfile`, `deploy/docker-compose.yml`, `deploy/Caddyfile`, `deploy/bootstrap-server.sh`,
+Files: `Dockerfile`, `deploy/docker-compose.yml`, `deploy/Caddyfile.site`,
+`deploy/attach-to-proxy.sh`, `deploy/bootstrap-server.sh` (fresh servers only),
 `.github/workflows/deploy.yml`.
 
-## 1. Open the cloud firewall
+## 1. Cloud firewall
 
-In your cloud console's security group for the server, allow inbound **TCP 22, TCP 80, TCP 443, UDP 443**.
-(`bootstrap-server.sh` configures the server's own `ufw` firewall, but a cloud security group sits in
-front of it and must allow the same ports.)
+The shared proxy already serves 80/443, so nothing new needs opening. Keep SSH (22) open
+for the deploy job.
 
 ## 2. Create a deploy key (on your laptop)
 
@@ -29,19 +32,30 @@ ssh -i ~/.ssh/hemora_deploy ubuntu@<SERVER_IP> 'echo deploy key works'
 
 ## 3. Prepare the server (once)
 
+On a server that already has Docker (like the current one) skip `bootstrap-server.sh`; just make sure
+`/opt/hemora` exists and belongs to the deploy user:
+
 ```bash
-scp deploy/bootstrap-server.sh ubuntu@<SERVER_IP>:~
-ssh ubuntu@<SERVER_IP> 'bash ~/bootstrap-server.sh'
-ssh ubuntu@<SERVER_IP> 'docker --version && docker compose version && ls -la /opt/hemora'
+sudo mkdir -p /opt/hemora && sudo chown ubuntu:ubuntu /opt/hemora
 ```
 
-The script installs Docker Engine + Compose, adds `ubuntu` to the `docker` group, enables `ufw`
-(22/80/443), adds 2 GB swap if none exists, turns on unattended security upgrades, and creates
-`/opt/hemora/.env`.
+Then, from your laptop in the repo, copy the proxy files and attach HEMORA to the shared Caddy:
+
+```bash
+scp deploy/Caddyfile.site deploy/attach-to-proxy.sh ubuntu@<SERVER_IP>:/opt/hemora/
+ssh -t ubuntu@<SERVER_IP> 'bash /opt/hemora/attach-to-proxy.sh "hemora.<SERVER_IP>.sslip.io"'
+```
+
+The script finds the proxy's network and Caddyfile, writes `PROXY_NETWORK` to `/opt/hemora/.env`,
+backs up the Caddyfile, adds a `# BEGIN HEMORA … # END HEMORA` block, validates it and reloads Caddy
+gracefully. If validation fails it restores the backup, so the other sites are never affected.
+`hemora.<SERVER_IP>.sslip.io` is a free wildcard DNS name for the server IP, good until a real domain
+exists; Caddy still issues an HTTPS certificate for it.
 
 ## 4. Add GitHub secrets
 
-Repository → Settings → Secrets and variables → Actions → New repository secret:
+Repository → Settings → Secrets and variables → Actions → New repository secret (or as secrets of an
+environment named exactly `production`, which the deploy job uses):
 
 | Secret | Value |
 |---|---|
@@ -65,19 +79,16 @@ The container image is private on GHCR; the workflow logs the server in with the
 ## 5. Deploy
 
 Merge to `main` (or run **Actions → Deploy → Run workflow** once the workflow exists on `main`).
-When the run is green, open `http://<SERVER_IP>`.
+When the run is green, open `https://hemora.<SERVER_IP>.sslip.io`.
 
-## 6. Add a domain + HTTPS
+## 6. Switch to a real domain
 
 1. Create DNS `A` records for the domain (and `www`) pointing to the server IP.
-2. On the server:
+2. Re-run the attach script with the new address (it replaces the HEMORA block):
    ```bash
-   cd /opt/hemora
-   sed -i 's/^SITE_ADDRESS=.*/SITE_ADDRESS=hemora.id, www.hemora.id/' .env
-   docker compose up -d
-   docker compose logs -f caddy   # watch the certificate being issued
+   ssh -t ubuntu@<SERVER_IP> 'bash /opt/hemora/attach-to-proxy.sh "hemora.id, www.hemora.id"'
+   docker logs -f n8n-caddy-1   # on the server: watch the certificate being issued
    ```
-Caddy obtains and renews Let's Encrypt certificates automatically.
 
 ## Operations
 

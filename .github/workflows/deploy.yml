@@ -79,7 +79,7 @@ jobs:
       - name: Upload stack files
         env:
           TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
-        run: scp -i ~/.ssh/deploy_key deploy/docker-compose.yml deploy/Caddyfile "$TARGET:/opt/hemora/"
+        run: scp -i ~/.ssh/deploy_key deploy/docker-compose.yml deploy/Caddyfile.site deploy/attach-to-proxy.sh "$TARGET:/opt/hemora/"
 
       - name: Pull and restart
         env:
@@ -92,6 +92,7 @@ jobs:
             "WEB_IMAGE='$WEB_IMAGE' GHCR_USER='$GHCR_USER' GHCR_TOKEN='$GHCR_TOKEN' bash -s" <<'REMOTE'
           set -euo pipefail
           cd /opt/hemora
+          grep -q '^PROXY_NETWORK=' .env || { echo "PROXY_NETWORK missing in /opt/hemora/.env - run attach-to-proxy.sh once (docs/DEPLOYMENT.md)." >&2; exit 1; }
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
           # Pin the running image so a manual `docker compose up -d` keeps this release.
           sed -i '/^WEB_IMAGE=/d' .env && echo "WEB_IMAGE=$WEB_IMAGE" >> .env
@@ -101,7 +102,8 @@ jobs:
           for attempt in $(seq 1 30); do
             if docker compose exec -T web wget -qO- http://127.0.0.1:3000/api/health >/dev/null 2>&1; then
               echo "Healthy: $WEB_IMAGE"
-              docker image prune -f >/dev/null
+              # Shared server: prune only superseded HEMORA images, never other projects'.
+              docker image prune -f --filter "label=org.opencontainers.image.source=https://github.com/taufikandrian18/hemora" >/dev/null
               exit 0
             fi
             sleep 2
