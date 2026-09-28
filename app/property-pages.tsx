@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- Vinext dev does not provide ASSETS for local image optimization. */
+import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
-import { menuSections, properties, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
+import { getSiblingProperty, menuSections, properties, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
+import { SliderControls } from "./motion";
 
 type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "hotel-simple" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
 
@@ -22,6 +24,48 @@ function WhatsAppIcon() {
   return <HemoraIcon name="phone" className="chat-mark" />;
 }
 
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function cssVars(vars: Record<string, string | number>) {
+  return vars as CSSProperties;
+}
+
+/** Splits a line into word spans so CSS can stagger each word's entrance. */
+function Words({ text, offset = 0 }: { text: string; offset?: number }) {
+  const words = text.split(" ");
+
+  return (
+    <>
+      {words.map((word, index) => (
+        <Fragment key={`${word}-${index}`}>
+          <span className="word" style={cssVars({ "--i": index + offset })}>
+            <span>{word}</span>
+          </span>
+          {index < words.length - 1 ? " " : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+/** Heading whose words brighten one by one as it scrolls through the viewport. */
+function ScrollWords({ text, className }: { text: string; className?: string }) {
+  const words = text.split(" ");
+
+  return (
+    <h2 className={["scroll-words", className].filter(Boolean).join(" ")} data-scroll-words style={cssVars({ "--n": words.length })}>
+      {words.map((word, index) => (
+        <span key={`${word}-${index}`} style={cssVars({ "--i": index })}>
+          {word}
+          {index < words.length - 1 ? " " : null}
+        </span>
+      ))}
+    </h2>
+  );
+}
+
 function StatLabel({ label }: { label: string }) {
   const [firstWord, ...rest] = label.split(" ");
 
@@ -38,6 +82,22 @@ function StatLabel({ label }: { label: string }) {
   );
 }
 
+function IconStats({ property, className, itemClassName }: { property: PropertyData; className: string; itemClassName: string }) {
+  return (
+    <div className={className} aria-label="Property highlights">
+      {property.stats.map((stat, index) => (
+        <div className={`${itemClassName} icon-stat`} key={`${stat.value}-${stat.label}`}>
+          <div className="stat-value-row">
+            <HemoraIcon name={heroStatIcons[index] ?? "bar"} className="hero-stat-icon" />
+            <strong>{stat.value}</strong>
+          </div>
+          <StatLabel label={stat.label} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function BrandLockup({ compact = false, href = "/" }: { compact?: boolean; href?: string }) {
   return (
     <Link className={compact ? "brand-lockup compact" : "brand-lockup"} href={href}>
@@ -47,35 +107,56 @@ function BrandLockup({ compact = false, href = "/" }: { compact?: boolean; href?
 }
 
 function PropertyNav({ property, active }: { property: PropertyData; active?: MenuSlug }) {
+  const sibling = getSiblingProperty(property);
+
   return (
     <header className="property-nav">
-      <Link href="/" aria-label="Back to overview" className="back-link icon-only">
-        <BackIcon />
-      </Link>
+      <div className="nav-left">
+        <details className="site-menu">
+          <summary aria-label={`Open ${property.shortTitle} menu`}>
+            <HemoraIcon name="menu" className="menu-mark" />
+            <HemoraIcon name="close" className="close-mark" />
+            <span className="menu-label">Menu</span>
+          </summary>
+          <div className="site-menu-panel">
+            <div className="site-menu-previews" aria-hidden="true">
+              <img src={property.heroImage} alt="" />
+              {menuSections.map((item) => (
+                <img key={item.slug} className={`preview-${item.slug}`} src={property.sections[item.slug].image} alt="" />
+              ))}
+            </div>
+            <nav className="site-menu-links" aria-label={`${property.shortTitle} menu`}>
+              <p className="eyebrow">{property.title}</p>
+              {menuSections.map((item, index) => (
+                <Link key={item.slug} href={`/${property.slug}/${item.slug}`} className={item.slug === active ? `menu-link-${item.slug} active` : `menu-link-${item.slug}`}>
+                  <small>{pad(index + 1)}</small>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="site-menu-aside">
+              <div>
+                <p className="eyebrow">Contact</p>
+                <p>{property.address}</p>
+                <a href={`mailto:${property.email}`}>{property.email}</a>
+                <a href={`tel:${property.phone.replaceAll(" ", "")}`}>{property.phone}</a>
+              </div>
+              <Link className="menu-sibling" href={`/${sibling.slug}`}>
+                <span className="eyebrow">Also by HEMORA</span>
+                <strong>{sibling.shortTitle}</strong>
+                <ArrowIcon />
+              </Link>
+            </div>
+          </div>
+        </details>
+        <Link href="/" aria-label="Back to overview" className="back-link icon-only">
+          <BackIcon />
+        </Link>
+      </div>
       <BrandLockup compact href={`/${property.slug}`} />
-      <nav className="desktop-menu" aria-label={`${property.shortTitle} menu`}>
-        {menuSections.map((item) => (
-          <Link key={item.slug} href={`/${property.slug}/${item.slug}`} className={item.slug === active ? "active" : undefined}>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
       <Link className="nav-reserve" href={`/${property.slug}#book`}>
         Reserve
       </Link>
-      <details className="mobile-menu">
-        <summary aria-label={`Open ${property.shortTitle} menu`}>
-          <HemoraIcon name="menu" className="menu-mark" />
-          <HemoraIcon name="close" className="close-mark" />
-        </summary>
-        <nav className="mobile-menu-panel" aria-label={`${property.shortTitle} mobile menu`}>
-          {menuSections.map((item) => (
-            <Link key={item.slug} href={`/${property.slug}/${item.slug}`} className={item.slug === active ? "active" : undefined}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </details>
     </header>
   );
 }
@@ -91,10 +172,11 @@ function WhatsAppWidget({ property }: { property: PropertyData }) {
 function BookingCta({ property }: { property: PropertyData }) {
   return (
     <section id="book" className="booking-cta">
-      <img src={property.bookingImage} alt={property.bookingAlt} />
-      <div className="booking-shade" />
-      <div className="booking-content">
-        <p className="eyebrow">§ 06 — Reserve</p>
+      <div className="booking-media" data-reveal="clip">
+        <img src={property.bookingImage} alt={property.bookingAlt} />
+      </div>
+      <div className="booking-content" data-reveal>
+        <p className="eyebrow">§ 07 — Reserve</p>
         <h2>{property.bookingTitle}</h2>
         <p>{property.bookingLead}</p>
         <form className="booking-form">
@@ -134,41 +216,68 @@ function BookingCta({ property }: { property: PropertyData }) {
 }
 
 function Footer({ property }: { property: PropertyData }) {
+  const sibling = getSiblingProperty(property);
+
   return (
     <footer className="site-footer">
-      <div>
-        <BrandLockup compact href={`/${property.slug}`} />
-        <p>{property.address}</p>
-        <a href={`mailto:${property.email}`}>{property.email}</a>
-        <a href={`tel:${property.phone.replaceAll(" ", "")}`}>{property.phone}</a>
+      <div className="footer-top">
+        <div className="footer-contact">
+          <p className="eyebrow">{property.title}</p>
+          <p>{property.address}</p>
+          <a href={`mailto:${property.email}`}>{property.email}</a>
+          <a href={`tel:${property.phone.replaceAll(" ", "")}`}>{property.phone}</a>
+        </div>
+        <nav aria-label={`${property.shortTitle} footer`}>
+          <p className="eyebrow">Explore</p>
+          <Link href={`/${property.slug}/stay`}>Stay</Link>
+          <Link href={`/${property.slug}/dining`}>Dining</Link>
+          <Link href={`/${property.slug}/wellness`}>Wellness</Link>
+          <Link href={`/${property.slug}/journal`}>Journal</Link>
+        </nav>
+        <Link className="footer-sibling" href={`/${sibling.slug}`}>
+          <span className="eyebrow">Also by HEMORA</span>
+          <img src={sibling.heroImage} alt="" />
+          <strong>
+            {sibling.shortTitle}
+            <ArrowIcon />
+          </strong>
+          <small>{sibling.location}</small>
+        </Link>
       </div>
-      <nav aria-label={`${property.shortTitle} footer`}>
-        <Link href={`/${property.slug}/stay`}>Stay</Link>
-        <Link href={`/${property.slug}/dining`}>Dining</Link>
-        <Link href={`/${property.slug}/wellness`}>Wellness</Link>
-        <Link href={`/${property.slug}/journal`}>Journal</Link>
-      </nav>
-      <p>© 2026 Hemora · All rights reserved</p>
+      <Link className="footer-wordmark" href={`/${property.slug}`} aria-label={`${property.shortTitle} home`}>
+        <img src="/assets/hemora/hemora-logo.png" alt="" width={920} height={167} />
+      </Link>
+      <div className="footer-bottom">
+        <p>© 2026 Hemora · All rights reserved</p>
+        <p>A Mora Group hospitality brand</p>
+      </div>
     </footer>
   );
 }
 
 function PropertyHero({ property }: { property: PropertyData }) {
+  const titleWords = property.heroTitle.split(" ").length;
+
   return (
     <section className="hero-stage">
-      <img className="hero-image" src={property.heroImage} alt={property.heroAlt} />
+      <video className="hero-media" autoPlay muted loop playsInline preload="metadata" poster={property.heroPoster} aria-label={property.heroAlt}>
+        <source src={property.heroVideo} type="video/mp4" />
+      </video>
       <div className="hero-tint" />
+      <div className="grain-layer" />
       <div className="hero-content">
         <div className="hero-topline">
           <p className="eyebrow">{property.heroKicker}</p>
-          <p className="eyebrow">{property.tone}</p>
+          <p className="eyebrow">A HEMORA property</p>
         </div>
-        <div>
+        <div className="hero-main">
           <p className="property-name">{property.title}</p>
-          <h1>
-            {property.heroTitle}
+          <h1 className="words-rise">
+            <Words text={property.heroTitle} />
             <br />
-            <em>{property.heroEmphasis}</em>
+            <em>
+              <Words text={property.heroEmphasis} offset={titleWords} />
+            </em>
           </h1>
           <div className="hero-lower-grid">
             <p>{property.intro}</p>
@@ -176,23 +285,11 @@ function PropertyHero({ property }: { property: PropertyData }) {
               {property.primaryAction}
               <ArrowIcon />
             </a>
-            <div className="hero-stats hero-icon-stats" aria-label="Property highlights">
-              {property.stats.map((stat, index) => (
-                <div className="hero-stat icon-stat" key={`${stat.value}-${stat.label}`}>
-                  <div className="stat-value-row">
-                    <HemoraIcon name={heroStatIcons[index] ?? "bar"} className="hero-stat-icon" />
-                    <strong>{stat.value}</strong>
-                  </div>
-                  <StatLabel label={stat.label} />
-                </div>
-              ))}
-            </div>
           </div>
         </div>
-        <div className="scroll-cue" aria-hidden="true">
-          <span />
-          Scroll
-        </div>
+      </div>
+      <div className="hero-strip">
+        <IconStats property={property} className="hero-stats hero-icon-stats" itemClassName="hero-stat" />
       </div>
     </section>
   );
@@ -201,48 +298,62 @@ function PropertyHero({ property }: { property: PropertyData }) {
 function Intro({ property }: { property: PropertyData }) {
   return (
     <section className="property-intro">
-      <div>
+      <div className="intro-head">
         <p className="eyebrow">{property.philosophyLabel}</p>
+        <p className="eyebrow">{property.location}</p>
       </div>
-      <div>
-        <h2>{property.philosophyTitle}</h2>
-        <p className="lead-copy">{property.philosophyLead}</p>
-        <p>{property.philosophyBody}</p>
-        <div className="intro-stats">
-          {property.stats.map((stat, index) => (
-            <div className="intro-stat icon-stat" key={stat.label}>
-              <div className="stat-value-row">
-                <HemoraIcon name={heroStatIcons[index] ?? "bar"} className="hero-stat-icon" />
-                <strong>{stat.value}</strong>
-              </div>
-              <StatLabel label={stat.label} />
-            </div>
-          ))}
+      <ScrollWords text={property.philosophyTitle} />
+      <div className="intro-grid">
+        <figure className="intro-figure intro-figure-tall" data-reveal="clip">
+          <img src={property.sections.stay.image} alt={property.sections.stay.alt} />
+        </figure>
+        <div className="intro-copy" data-reveal>
+          <p className="lead-copy">{property.philosophyLead}</p>
+          <p>{property.philosophyBody}</p>
+          <IconStats property={property} className="intro-stats" itemClassName="intro-stat" />
         </div>
+        <figure className="intro-figure intro-figure-small" data-reveal="clip">
+          <img src={property.sections.dining.image} alt={property.sections.dining.alt} />
+          <figcaption>{property.sections.dining.caption}</figcaption>
+        </figure>
       </div>
     </section>
   );
 }
 
 function Offers({ property }: { property: PropertyData }) {
+  const trackId = `offers-${property.slug}`;
+
   return (
     <section className="offers-section">
-      <div className="section-heading-row">
+      <div className="section-heading-row" data-reveal>
         <div>
           <p className="eyebrow">§ 02 — Current Offerings</p>
           <h2>{property.offersTitle}</h2>
         </div>
-        <p>{property.offersIntro}</p>
+        <div className="section-heading-aside">
+          <p>{property.offersIntro}</p>
+          <SliderControls targetId={trackId} count={property.offers.length} />
+        </div>
       </div>
-      <div className="offers-carousel" aria-label={`${property.shortTitle} offers`}>
-        {property.offers.map((offer) => (
-          <article className="offer-card" key={offer.name}>
-            <img src={offer.image} alt={offer.alt} />
-            <div>
+      <div className="offers-carousel" id={trackId} aria-label={`${property.shortTitle} offers`}>
+        {property.offers.map((offer, index) => (
+          <article className="offer-card" key={offer.name} data-reveal style={cssVars({ "--delay": `${index * 90}ms` })}>
+            <div className="offer-media">
+              <img src={offer.image} alt={offer.alt} />
+              <span className="offer-index">{pad(index + 1)}</span>
+            </div>
+            <div className="offer-body">
               <span>{offer.meta}</span>
               <h3>{offer.name}</h3>
               <p>{offer.description}</p>
-              <strong>{offer.rate}</strong>
+              <div className="offer-foot">
+                <strong>{offer.rate}</strong>
+                <a className="link-arrow" href="#book">
+                  Enquire
+                  <ArrowIcon />
+                </a>
+              </div>
             </div>
           </article>
         ))}
@@ -251,23 +362,30 @@ function Offers({ property }: { property: PropertyData }) {
   );
 }
 
-function AlternatingBlock({ section, index, property }: { section: PropertySection; index: number; property: PropertyData }) {
+function Chapter({ section, index, property }: { section: PropertySection; index: number; property: PropertyData }) {
   return (
-    <section id={section.slug} className={index % 2 ? "alternating-block reverse" : "alternating-block"}>
-      <div className="block-image">
+    <section id={section.slug} className={index % 2 ? "chapter-panel reverse" : "chapter-panel"}>
+      <div className="chapter-media">
         <img src={section.image} alt={section.alt} />
-        <div>
-          <span>{section.caption}</span>
-          <span>{section.meta}</span>
-        </div>
+        <div className="chapter-shade" />
+        <p className="chapter-label" aria-hidden="true">
+          {section.label}
+        </p>
       </div>
-      <div className="block-copy">
-        <p className="eyebrow">{section.eyebrow}</p>
+      <div className="chapter-card" data-reveal>
+        <div className="chapter-card-head">
+          <span className="chapter-index">{pad(index + 1)}</span>
+          <p className="eyebrow">{section.eyebrow}</p>
+        </div>
         <h2>{section.title}</h2>
         <p>{section.body}</p>
         {section.secondary ? <p>{section.secondary}</p> : null}
+        <div className="chapter-meta">
+          <span>{section.caption}</span>
+          <span>{section.meta}</span>
+        </div>
         <Link className="link-arrow" href={`/${property.slug}/${section.slug}`}>
-          Open {section.label}
+          Discover {section.label}
           <ArrowIcon />
         </Link>
       </div>
@@ -278,9 +396,6 @@ function AlternatingBlock({ section, index, property }: { section: PropertySecti
 function QuoteBand({ property }: { property: PropertyData }) {
   return (
     <section className="quote-band">
-      <p className="eyebrow">§ 06 — In Other Words</p>
-      <blockquote>{property.quote}</blockquote>
-      <span>{property.quoteSource}</span>
       <div className="marquee-strip" aria-hidden="true">
         <div>
           {[...property.marquee, ...property.marquee].map((item, index) => (
@@ -288,19 +403,22 @@ function QuoteBand({ property }: { property: PropertyData }) {
           ))}
         </div>
       </div>
+      <div className="quote-body" data-reveal>
+        <p className="eyebrow">§ 06 — In Other Words</p>
+        <blockquote>{property.quote}</blockquote>
+        <span>{property.quoteSource}</span>
+      </div>
     </section>
   );
 }
 
 export function HomeSelector() {
+  const panels = [properties.lereng, properties.sriti];
+
   return (
     <main className="selector-shell">
-      <video className="selector-video" autoPlay muted loop playsInline preload="metadata" poster="/assets/hemora/lereng/hero.png" aria-hidden="true">
-        <source src="/assets/hemora/hemora-hero.mp4" type="video/mp4" />
-      </video>
-      <div className="screen-tint home-tint" />
-      <div className="grain-layer" />
       <header className="selector-topbar home-topbar">
+        <p className="eyebrow">Two Sanctuaries · One Standard of Stillness</p>
         <BrandLockup />
         <nav className="selector-dots" aria-label="Property selector">
           <Link className="dot active" href="/" aria-label="Overview" />
@@ -308,27 +426,32 @@ export function HomeSelector() {
           <Link className="dot" href="/sriti" aria-label="Sriti Palu" />
         </nav>
       </header>
-      <div className="selector-content home-selector-content">
-        <p className="eyebrow">Two Sanctuaries · One Standard of Stillness</p>
-        <div className="selector-actions" aria-label="Choose a HEMORA property">
-          <Link className="selector-card" href="/lereng">
-            <HemoraIcon name="hotel-simple" className="selector-property-icon" />
-            <span>
-              <strong>{properties.lereng.title}</strong>
-              <small>Highland retreat above tea slopes</small>
+      <div className="split-panels" aria-label="Choose a HEMORA property">
+        {panels.map((property, index) => (
+          <Link key={property.slug} className={`split-panel split-panel-${property.slug}`} href={`/${property.slug}`}>
+            <video className="split-video" autoPlay muted loop playsInline preload="metadata" poster={property.heroPoster} aria-hidden="true">
+              <source src={property.heroVideo} type="video/mp4" />
+            </video>
+            <span className="split-shade" />
+            <span className="split-index">
+              {pad(index + 1)} — {property.location}
             </span>
-            <ArrowIcon />
-          </Link>
-          <Link className="selector-card" href="/sriti">
-            <HemoraIcon name="hotel-simple" className="selector-property-icon" />
-            <span>
-              <strong>{properties.sriti.title}</strong>
-              <small>Warm city hotel with an atrium heart</small>
+            <span className="split-body">
+              <HemoraIcon name="hotel-simple" className="selector-property-icon" />
+              <span className="split-tone">{property.tone}</span>
+              <strong className="split-title">{property.shortTitle}</strong>
+              <small className="split-line">{property.selectorLine}</small>
+              <span className="split-cta">
+                Discover
+                <span className="split-cta-icon">
+                  <ArrowIcon />
+                </span>
+              </span>
             </span>
-            <ArrowIcon />
           </Link>
-        </div>
+        ))}
       </div>
+      <div className="grain-layer" />
       <div className="scroll-cue home-cue" aria-hidden="true">
         <span />
         Choose your escape
@@ -345,7 +468,7 @@ export function PropertyLandingPage({ property }: { property: PropertyData }) {
       <Intro property={property} />
       <Offers property={property} />
       {menuSections.map((item, index) => (
-        <AlternatingBlock key={item.slug} section={property.sections[item.slug]} index={index} property={property} />
+        <Chapter key={item.slug} section={property.sections[item.slug]} index={index} property={property} />
       ))}
       <QuoteBand property={property} />
       <BookingCta property={property} />
@@ -356,21 +479,30 @@ export function PropertyLandingPage({ property }: { property: PropertyData }) {
 }
 
 export function PropertyMenuPage({ property, section }: { property: PropertyData; section: PropertySection }) {
+  const position = menuSections.findIndex((item) => item.slug === section.slug);
+  const next = property.sections[menuSections[(position + 1) % menuSections.length].slug];
+
   return (
     <main className={`menu-page property-page-${property.slug}`}>
       <PropertyNav property={property} active={section.slug} />
       <section className="menu-hero">
         <img src={section.image} alt={section.alt} />
         <div className="hero-tint" />
-        <div>
+        <div className="grain-layer" />
+        <div className="menu-hero-content">
           <p className="eyebrow">{section.eyebrow}</p>
           <p className="property-name">{property.title}</p>
-          <h1>{section.title}</h1>
+          <h1 className="words-rise">
+            <Words text={section.title} />
+          </h1>
           <p>{section.body}</p>
         </div>
+        <span className="menu-hero-index" aria-hidden="true">
+          {pad(position + 1)}
+        </span>
       </section>
       <section className="menu-detail-grid">
-        <div className="menu-lead">
+        <div className="menu-lead" data-reveal>
           <span>{section.caption}</span>
           <h2>{section.secondary ?? section.meta}</h2>
           <p>{section.meta}</p>
@@ -380,10 +512,15 @@ export function PropertyMenuPage({ property, section }: { property: PropertyData
           </Link>
         </div>
         <div className="detail-cards">
-          {section.details.map((detail) => (
-            <article key={detail.title}>
-              {detail.image ? <img src={detail.image} alt={detail.alt ?? detail.title} /> : null}
+          {section.details.map((detail, index) => (
+            <article key={detail.title} data-reveal>
+              {detail.image ? (
+                <div className="detail-media" data-reveal="clip">
+                  <img src={detail.image} alt={detail.alt ?? detail.title} />
+                </div>
+              ) : null}
               <div>
+                <span className="detail-index">{pad(index + 1)}</span>
                 <h3>{detail.title}</h3>
                 <p>{detail.body}</p>
               </div>
@@ -391,6 +528,16 @@ export function PropertyMenuPage({ property, section }: { property: PropertyData
           ))}
         </div>
       </section>
+      <Link className="next-chapter" href={`/${property.slug}/${next.slug}`}>
+        <img src={next.image} alt="" />
+        <span className="next-chapter-shade" />
+        <span className="eyebrow">Next chapter</span>
+        <strong>
+          {next.label}
+          <ArrowIcon />
+        </strong>
+        <small>{next.title}</small>
+      </Link>
       <BookingCta property={property} />
       <Footer property={property} />
       <WhatsAppWidget property={property} />

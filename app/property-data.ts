@@ -41,7 +41,10 @@ export type PropertyData = {
   location: string;
   tone: string;
   heroImage: string;
+  heroVideo: string;
+  heroPoster: string;
   heroAlt: string;
+  selectorLine: string;
   heroKicker: string;
   heroTitle: string;
   heroEmphasis: string;
@@ -83,6 +86,9 @@ export const properties: Record<PropertySlug, PropertyData> = {
     location: "Ciwidey, West Java",
     tone: "Highland Retreat",
     heroImage: "/assets/hemora/lereng/hero.png",
+    heroVideo: "/assets/hemora/hemora-hero.mp4",
+    heroPoster: "/assets/hemora/lereng/hero.png",
+    selectorLine: "Highland retreat above tea slopes",
     heroAlt: "Lereng Senja resort surrounded by tea slopes and morning mist",
     heroKicker: "Ciwidey, West Java · 1,450m above sea level",
     heroTitle: "Highland rooms",
@@ -102,7 +108,7 @@ export const properties: Record<PropertySlug, PropertyData> = {
     philosophyLead:
       "The highlands set the pace here. Mornings begin softly, afternoons gather around warm lounges, and evenings return guests to rooms that feel sheltered from the valley weather.",
     philosophyBody:
-      "The page keeps the reference draft's generous rhythm: a full cinematic hero, editorial intro, horizontal offers, alternating image blocks, guest note, direct booking cue, and a footer built for practical contact.",
+      "Forty-eight suites and villas sit along the slope, linked by covered corridors, garden tables, and lounges that stay warm long after the sun leaves the valley.",
     offersTitle: "Reasons to arrive sooner rather than later.",
     offersIntro: "Each offer is built around the weather: mist, warm meals, family time, and a slower Ciwidey morning.",
     offers: [
@@ -284,6 +290,9 @@ export const properties: Record<PropertySlug, PropertyData> = {
     location: "Palu, Central Sulawesi",
     tone: "City Hospitality",
     heroImage: "/assets/hemora/sriti/hero.png",
+    heroVideo: "/assets/hemora/sriti/hero.mp4",
+    heroPoster: "/assets/hemora/sriti/hero-poster.jpg",
+    selectorLine: "Warm city hotel with an atrium heart",
     heroAlt: "Sriti Palu sculptural staircase and atrium lounge",
     heroKicker: "Palu, Central Sulawesi · City hospitality",
     heroTitle: "A warmer city",
@@ -303,7 +312,7 @@ export const properties: Record<PropertySlug, PropertyData> = {
     philosophyLead:
       "Sriti Palu is built around the feeling of stepping in from the city and immediately slowing down. The atrium gives the page its center; the rooms give guests their quiet.",
     philosophyBody:
-      "The reference layout becomes a hospitality page here, but the palette stays HEMORA: deep forest, ivory, wood, umber, and restrained gold instead of a new cream-and-terracotta scheme.",
+      "Eighteen signature rooms open off arched corridors around a sculptural stair, so every return from the city passes through light, stone, and a moment of quiet.",
     offersTitle: "Ways to make a Palu stay feel easier.",
     offersIntro: "Direct arrival, warmer rooms, and dining that works for meetings, family visits, and late returns.",
     offers: [
@@ -479,6 +488,10 @@ export const properties: Record<PropertySlug, PropertyData> = {
     phone: "+62 812 3456 7890",
   },
 };
+
+export function getSiblingProperty(property: PropertyData) {
+  return properties[property.slug === "lereng" ? "sriti" : "lereng"];
+}
 
 export const propertySlugs = Object.keys(properties) as PropertySlug[];
 
