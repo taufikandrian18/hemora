@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { getProperty, getPropertySection, menuSections, propertySlugs } from "../../property-data";
 import { PropertyMenuPage } from "../../property-pages";
 
+// Every property/section is known at build time; anything else is a real 404.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return propertySlugs.flatMap((property) => menuSections.map((section) => ({ property, section: section.slug })));
 }

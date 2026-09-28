@@ -1,0 +1,20 @@
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# Next.js build output is content-hashed, so it can be cached forever.
+	@hashed path /_next/static/*
+	header @hashed >Cache-Control "public, max-age=31536000, immutable"
+
+	# Public assets keep their filenames when replaced, so cache them for a week only.
+	@assets path /assets/* /favicon.png /favicon.svg
+	header @assets >Cache-Control "public, max-age=604800"
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	reverse_proxy web:3000
+}
