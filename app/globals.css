@@ -13,11 +13,11 @@
   --color-night: #121612;
   --background: var(--color-forest);
   --foreground: var(--color-ivory);
-  /* Display face matches KUBE's Saphion Light. The @font-face below loads a licensed copy
-     from /assets/hemora/fonts; until one is added, Josefin Sans Light (OFL) stands in. */
-  --font-display: "Saphion", "Josefin Sans", "Helvetica Neue", Arial, sans-serif;
-  --display-weight: 300;
-  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Mora Group typography: Montserrat Thin for display, Figtree for text (both SIL OFL). */
+  --font-display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 100;
+  --display-weight-text: 300;
+  --font-body: "Figtree", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-card: cubic-bezier(0.22, 1, 0.36, 1);
   --gutter: clamp(1.2rem, 4vw, 3.25rem);
@@ -27,17 +27,6 @@
 
 :root[data-loaded] {
   --intro-delay: 0.45s;
-}
-
-@font-face {
-  font-display: swap;
-  font-family: "Saphion";
-  font-style: normal;
-  font-weight: 300;
-  src:
-    local("Saphion Light"),
-    local("Saphion-Light"),
-    url("/assets/hemora/fonts/saphion-light.woff2") format("woff2");
 }
 
 @theme inline {
@@ -566,7 +555,7 @@ figure {
 
 .split-title {
   font-family: var(--font-display);
-  font-size: clamp(3.2rem, 7vw, 7.6rem);
+  font-size: clamp(2.8rem, 5.4vw, 6rem);
   font-weight: var(--display-weight);
   letter-spacing: -0.02em;
   line-height: 0.9;
@@ -838,6 +827,7 @@ figure {
   color: rgb(236 230 218 / 0.9);
   display: flex;
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: clamp(3rem, 6.4vw, 6.6rem);
   gap: 1.1rem;
   letter-spacing: -0.02em;
@@ -1293,6 +1283,7 @@ figure {
   color: var(--color-gold);
   float: left;
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 4rem;
   line-height: 0.82;
   margin: 0.2rem 0.6rem 0 0;
@@ -1446,6 +1437,7 @@ figure {
 .offer-index {
   color: var(--color-ivory);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 1.4rem;
   left: 1.1rem;
   position: absolute;
@@ -1528,6 +1520,7 @@ figure {
   bottom: -0.14em;
   color: rgb(236 230 218 / 0.92);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: clamp(5.5rem, 21vw, 22rem);
   left: var(--gutter);
   letter-spacing: -0.035em;
@@ -1573,6 +1566,7 @@ figure {
 .chapter-index {
   color: var(--color-gold);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 2.6rem;
   line-height: 1;
 }
@@ -1636,6 +1630,7 @@ figure {
   color: rgb(236 230 218 / 0.86);
   display: inline-flex;
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: clamp(2.6rem, 7vw, 7.4rem);
   gap: clamp(1.6rem, 3.5vw, 3.4rem);
   letter-spacing: -0.02em;
@@ -1664,6 +1659,7 @@ figure {
 
 .quote-band blockquote {
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: clamp(2rem, 4.4vw, 4.4rem);
   font-style: normal;
   letter-spacing: -0.01em;
@@ -1747,6 +1743,7 @@ figure {
   border-bottom: 1px solid rgb(236 230 218 / 0.3);
   color: var(--color-ivory);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 1.35rem;
   min-height: 2.8rem;
   outline: 0;
@@ -1807,6 +1804,7 @@ figure {
 .site-footer nav a {
   color: rgb(236 230 218 / 0.8);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 1.7rem;
   line-height: 1.2;
   transition: color 300ms ease;
@@ -1983,6 +1981,7 @@ figure {
   bottom: -0.12em;
   color: rgb(236 230 218 / 0.16);
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: clamp(9rem, 26vw, 26rem);
   letter-spacing: -0.04em;
   line-height: 0.8;
@@ -2053,6 +2052,7 @@ figure {
 .detail-index {
   color: var(--color-gold) !important;
   font-family: var(--font-display);
+  font-weight: var(--display-weight);
   font-size: 2.6rem;
   letter-spacing: 0 !important;
   line-height: 1;
@@ -2131,6 +2131,25 @@ figure {
 
 .next-chapter:hover strong .hemora-icon {
   transform: translateX(0.3em) rotate(-45deg);
+}
+
+/* Montserrat Thin is reserved for large display sizes; smaller headings step up a weight. */
+.offer-card h3,
+.chapter-card h2,
+.detail-cards h3,
+.menu-lead h2,
+.hero-stat strong,
+.intro-stat strong,
+.site-footer nav a,
+.footer-sibling strong,
+.menu-sibling strong,
+.chapter-index,
+.detail-index,
+.offer-index,
+.booking-form input,
+.booking-form select,
+.lead-copy::first-letter {
+  font-weight: var(--display-weight-text);
 }
 
 @keyframes kenburns {
@@ -2434,9 +2453,15 @@ figure {
     justify-items: stretch;
   }
 
+  :root {
+    --display-weight: 200;
+  }
+
   .hero-stage h1,
   .menu-hero h1 {
-    font-size: clamp(3rem, 14vw, 4.8rem);
+    font-size: clamp(2.5rem, 11vw, 4rem);
+    line-height: 0.98;
+    text-shadow: 0 2px 22px rgb(18 22 18 / 0.6);
   }
 
   .hero-strip {

@@ -83,8 +83,8 @@ test("uses the supplied HEMORA wordmark and favicon assets", async () => {
   assert.match(layout, /<LoadingScreen className="page-load-transition" \/>/);
   assert.match(layout, /<PageTransition \/>/);
   assert.match(layout, /<MotionEffects \/>/);
-  assert.match(layout, /family=Inter:wght@100\.\.900/);
-  assert.match(layout, /family=Josefin\+Sans:wght@300/);
+  assert.match(layout, /family=Figtree:wght@300\.\.900/);
+  assert.match(layout, /family=Montserrat:wght@100\.\.300/);
   assert.match(loading, /className="network-loader"/);
   assert.match(transition, /usePathname/);
 });
@@ -228,8 +228,10 @@ test("keeps the HEMORA brand palette and direct local assets", async () => {
   const scrollWordsBlock = cssBlock(css, ".scroll-words span");
   const primaryActionBlock = cssBlock(css, ".primary-action");
 
-  assert.match(css, /--font-display: "Saphion", "Josefin Sans"/);
-  assert.match(css, /@font-face\s*{[^}]*font-family:\s*"Saphion";[^}]*url\("\/assets\/hemora\/fonts\/saphion-light\.woff2"\)/);
+  assert.match(css, /--font-display: "Montserrat"/);
+  assert.match(css, /--font-body: "Figtree"/);
+  assert.match(css, /--display-weight: 100;/);
+  assert.doesNotMatch(css, /Saphion|Josefin|Instrument Serif/);
   assert.doesNotMatch(css, /font-style:\s*italic/);
   assert.match(css, /--ease-out: cubic-bezier\(0\.16, 1, 0\.3, 1\);/);
   assert.match(navBlock, /background:\s*transparent;/);
