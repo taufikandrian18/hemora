@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element -- Vinext dev does not provide ASSETS for local image optimization. */
 import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
-import { getSiblingProperty, menuSections, properties, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
-import { SliderControls } from "./motion";
+import { bookingBaseUrl, getSiblingProperty, menuSections, properties, propertySlugs, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
+import { BookingForm, LocalTime, SliderControls } from "./motion";
 
 type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "hotel-simple" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
 
@@ -179,117 +179,146 @@ function BookingCta({ property }: { property: PropertyData }) {
         <p className="eyebrow">§ 07 — Reserve</p>
         <h2>{property.bookingTitle}</h2>
         <p>{property.bookingLead}</p>
-        <form className="booking-form">
-          <label>
-            <span>Arrival</span>
-            <input defaultValue="2026-08-14" type="date" />
-          </label>
-          <label>
-            <span>Departure</span>
-            <input defaultValue="2026-08-16" type="date" />
-          </label>
-          <label>
-            <span>Guests</span>
-            <select defaultValue="2 adults">
-              <option>2 adults</option>
-              <option>3 adults</option>
-              <option>4 adults</option>
-              <option>Family</option>
-            </select>
-          </label>
-          <label>
-            <span>Room</span>
-            <select defaultValue={property.offers[0].name}>
-              {property.offers.map((offer) => (
-                <option key={offer.name}>{offer.name}</option>
-              ))}
-            </select>
-          </label>
-        </form>
-        <a className="primary-action booking-action" href="https://wa.me/6281234567890">
-          Check Availability
-          <ArrowIcon />
-        </a>
+        <BookingForm action={bookingBaseUrl} propertyId={property.bookingPropertyId} />
       </div>
     </section>
   );
 }
 
-function Footer({ property }: { property: PropertyData }) {
-  const sibling = getSiblingProperty(property);
+/** HEMORA wordmark set in the display face, with the brand mark standing in for the "O". */
+function Wordmark({ className }: { className?: string }) {
+  return (
+    <span className={["type-wordmark", className].filter(Boolean).join(" ")} aria-hidden="true">
+      <span>H</span>
+      <span>E</span>
+      <span>M</span>
+      <i className="type-wordmark-mark" />
+      <span>R</span>
+      <span>A</span>
+    </span>
+  );
+}
 
+function Footer({ property }: { property: PropertyData }) {
   return (
     <footer className="site-footer">
-      <div className="footer-top">
-        <div className="footer-contact">
-          <p className="eyebrow">{property.title}</p>
+      <div className="grain-layer" />
+      <div className="footer-cta" data-reveal>
+        <p className="eyebrow">{property.title}</p>
+        <h2 className="footer-headline">
+          Stay a little <em>longer.</em>
+        </h2>
+        <a className="pill-cta" href="#book">
+          <span>Plan your stay</span>
+          <span className="pill-cta-badge">
+            <ArrowIcon />
+          </span>
+        </a>
+      </div>
+      <div className="footer-grid">
+        <div className="footer-col">
+          <p className="eyebrow">Visit</p>
           <p>{property.address}</p>
+          <LocalTime timeZone={property.timeZone} label={`${property.timeZoneLabel} · local time`} />
+        </div>
+        <div className="footer-col">
+          <p className="eyebrow">Talk to us</p>
           <a href={`mailto:${property.email}`}>{property.email}</a>
           <a href={`tel:${property.phone.replaceAll(" ", "")}`}>{property.phone}</a>
+          <a href="https://wa.me/6281234567890">WhatsApp concierge</a>
         </div>
-        <nav aria-label={`${property.shortTitle} footer`}>
+        <nav className="footer-col" aria-label={`${property.shortTitle} footer`}>
           <p className="eyebrow">Explore</p>
           <Link href={`/${property.slug}/stay`}>Stay</Link>
           <Link href={`/${property.slug}/dining`}>Dining</Link>
           <Link href={`/${property.slug}/wellness`}>Wellness</Link>
           <Link href={`/${property.slug}/journal`}>Journal</Link>
         </nav>
-        <Link className="footer-sibling" href={`/${sibling.slug}`}>
-          <span className="eyebrow">Also by HEMORA</span>
-          <img src={sibling.heroImage} alt="" />
-          <strong>
-            {sibling.shortTitle}
-            <ArrowIcon />
-          </strong>
-          <small>{sibling.location}</small>
-        </Link>
+        <div className="footer-col footer-collection">
+          <p className="eyebrow">The collection</p>
+          {propertySlugs.map((slug) => {
+            const item = properties[slug];
+            const current = slug === property.slug;
+            return (
+              <Link key={slug} href={`/${slug}`} className={current ? "collection-link current" : "collection-link"} aria-current={current ? "page" : undefined}>
+                <span>
+                  <strong>{item.shortTitle}</strong>
+                  <small>{item.location}</small>
+                </span>
+                <ArrowIcon />
+              </Link>
+            );
+          })}
+        </div>
       </div>
       <Link className="footer-wordmark" href={`/${property.slug}`} aria-label={`${property.shortTitle} home`}>
-        <img src="/assets/hemora/hemora-logo.png" alt="" width={920} height={167} />
+        <Wordmark />
       </Link>
       <div className="footer-bottom">
-        <p>© 2026 Hemora · All rights reserved</p>
-        <p>A Mora Group hospitality brand</p>
+        <p>© 2026 HEMORA · A Mora Group hospitality brand</p>
+        <a href="#top" className="back-to-top">
+          Back to top
+          <HemoraIcon name="arrow-right" className="back-to-top-icon" />
+        </a>
       </div>
     </footer>
   );
 }
 
-function PropertyHero({ property }: { property: PropertyData }) {
-  const titleWords = property.heroTitle.split(" ").length;
+/** Oversized property name; each letter rises in sequence. */
+function HeroWordmark({ lines }: { lines: string[] }) {
+  let index = 0;
 
   return (
-    <section className="hero-stage">
-      <video className="hero-media" autoPlay muted loop playsInline preload="metadata" poster={property.heroPoster} aria-label={property.heroAlt}>
-        <source src={property.heroVideo} type="video/mp4" />
-      </video>
-      <div className="hero-tint" />
-      <div className="grain-layer" />
-      <div className="hero-content">
-        <div className="hero-topline">
-          <p className="eyebrow">{property.heroKicker}</p>
-          <p className="eyebrow">A HEMORA property</p>
+    <h1 className="hero-wordmark">
+      {lines.map((line) => (
+        <span className="hero-wordmark-line" key={line}>
+          {Array.from(line).map((letter, position) => (
+            <span className="letter" key={`${letter}-${position}`} style={cssVars({ "--i": index++ })}>
+              {letter}
+            </span>
+          ))}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
+function PropertyHero({ property }: { property: PropertyData }) {
+  const order = propertySlugs.indexOf(property.slug) + 1;
+
+  return (
+    <section className={`hero-stage hero-${property.slug}`} id="top">
+      <div className="hero-frame">
+        <video className="hero-media" autoPlay muted loop playsInline preload="metadata" poster={property.heroPoster} aria-label={property.heroAlt}>
+          <source src={property.heroVideo} type="video/mp4" />
+        </video>
+        <div className="hero-tint" />
+        <div className="grain-layer" />
+        <div className="hero-meta">
+          <span>
+            {pad(order)} / {pad(propertySlugs.length)} — {property.location}
+          </span>
+          <span className="hero-coordinates">{property.coordinates}</span>
+          <LocalTime timeZone={property.timeZone} label={property.timeZoneLabel} />
         </div>
-        <div className="hero-main">
-          <p className="property-name">{property.title}</p>
-          <h1 className="words-rise">
-            <Words text={property.heroTitle} />
-            <br />
+        <div className="hero-aside">
+          <p className="property-name">{property.tone}</p>
+          <p className="hero-tagline words-rise">
+            <Words text={property.heroTitle} />{" "}
             <em>
-              <Words text={property.heroEmphasis} offset={titleWords} />
+              <Words text={property.heroEmphasis} offset={property.heroTitle.split(" ").length} />
             </em>
-          </h1>
-          <div className="hero-lower-grid">
-            <p>{property.intro}</p>
-            <a className="primary-action" href="#book">
-              {property.primaryAction}
+          </p>
+          <p className="hero-intro">{property.intro}</p>
+          <a className="pill-cta" href="#book">
+            <span>{property.primaryAction}</span>
+            <span className="pill-cta-badge">
               <ArrowIcon />
-            </a>
-          </div>
+            </span>
+          </a>
         </div>
-      </div>
-      <div className="hero-strip">
-        <IconStats property={property} className="hero-stats hero-icon-stats" itemClassName="hero-stat" />
+        <HeroWordmark lines={property.wordmark} />
       </div>
     </section>
   );
@@ -485,7 +514,7 @@ export function PropertyMenuPage({ property, section }: { property: PropertyData
   return (
     <main className={`menu-page property-page-${property.slug}`}>
       <PropertyNav property={property} active={section.slug} />
-      <section className="menu-hero">
+      <section className="menu-hero" id="top">
         <img src={section.image} alt={section.alt} />
         <div className="hero-tint" />
         <div className="grain-layer" />
