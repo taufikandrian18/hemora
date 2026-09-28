@@ -580,3 +580,63 @@ export function PropertyMenuPage({ property, section, collection }: { property: 
     </main>
   );
 }
+
+/** 404 — same inset frame and wordmark language as the property heroes. */
+export function NotFoundPage({ collection }: { collection: PropertyCollection }) {
+  const glyphs = ["4", "mark", "4"];
+
+  return (
+    <main className="notfound-shell">
+      <div className="notfound-frame">
+        <video className="notfound-media" autoPlay muted loop playsInline preload="metadata" poster={collection.lereng.heroPoster} aria-hidden="true">
+          <source src={collection.lereng.heroVideo} type="video/mp4" />
+        </video>
+        <div className="notfound-tint" />
+        <div className="grain-layer" />
+
+        <header className="notfound-bar">
+          <BrandLockup compact />
+          <p className="eyebrow">Error 404 · Page not found</p>
+        </header>
+
+        <section className="notfound-body" aria-labelledby="notfound-title">
+          <p className="notfound-code" aria-hidden="true">
+            {glyphs.map((glyph, index) => (
+              <span className="notfound-glyph" key={index}>
+                <span className="letter" style={cssVars({ "--i": index })}>
+                  {glyph === "mark" ? <i className="type-wordmark-mark" /> : glyph}
+                </span>
+              </span>
+            ))}
+          </p>
+          <h1 id="notfound-title" className="notfound-title words-rise">
+            <Words text="This path fades" offset={3} /> <em><Words text="into the mist." offset={6} /></em>
+          </h1>
+          <p className="notfound-lead">The page you were looking for has moved, or never existed. Let us walk you back to somewhere familiar.</p>
+          <div className="notfound-actions">
+            <Link className="pill-cta" href="/">
+              <span>Back to HEMORA</span>
+              <span className="pill-cta-badge">
+                <ArrowIcon />
+              </span>
+            </Link>
+            {propertySlugs.map((slug) => (
+              <Link key={slug} className="notfound-property" href={`/${slug}`}>
+                <span>
+                  <strong>{collection[slug].shortTitle}</strong>
+                  <small>{collection[slug].location}</small>
+                </span>
+                <ArrowIcon />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <footer className="notfound-rail">
+          <a href="https://wa.me/6281234567890">Lost? Ask our hosts on WhatsApp</a>
+          <span>© 2026 HEMORA · A Mora Group hospitality brand</span>
+        </footer>
+      </div>
+    </main>
+  );
+}
