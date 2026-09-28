@@ -261,17 +261,6 @@ video {
   margin-top: 0.36rem;
 }
 
-.selector-icon {
-  align-items: center;
-  background: rgb(180 147 98 / 0.2);
-  border: 1px solid rgb(180 147 98 / 0.36);
-  color: var(--color-gold);
-  display: inline-flex;
-  height: 2.75rem;
-  justify-content: center;
-  width: 2.75rem;
-}
-
 .hemora-icon {
   background: currentColor;
   display: inline-block;
@@ -325,11 +314,21 @@ video {
   --hemora-icon: url("/assets/hemora/hemora-icon-library/icons-light/sunrise.svg");
 }
 
+.hemora-icon-hotel-simple {
+  --hemora-icon: url("/assets/hemora/hemora-icon-library/icons-gold/hotel-simple.svg");
+}
+
 .selector-card .hemora-icon,
 .primary-action .hemora-icon,
 .link-arrow .hemora-icon {
   height: 1.15rem;
   width: 1.15rem;
+}
+
+.selector-card .selector-property-icon {
+  color: var(--color-gold);
+  height: clamp(2.05rem, 3vw, 2.45rem);
+  width: clamp(2.05rem, 3vw, 2.45rem);
 }
 
 .hemora-loader {

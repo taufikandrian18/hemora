@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { menuSections, properties, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
 
-type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
+type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "hotel-simple" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
 
 const heroStatIcons: HemoraIconName[] = ["bar", "dining", "spa", "ballroom"];
 
@@ -312,9 +312,7 @@ export function HomeSelector() {
         <p className="eyebrow">Two Sanctuaries · One Standard of Stillness</p>
         <div className="selector-actions" aria-label="Choose a HEMORA property">
           <Link className="selector-card" href="/lereng">
-            <span className="selector-icon">
-              <HemoraIcon name="leaf" />
-            </span>
+            <HemoraIcon name="hotel-simple" className="selector-property-icon" />
             <span>
               <strong>{properties.lereng.title}</strong>
               <small>Highland retreat above tea slopes</small>
@@ -322,9 +320,7 @@ export function HomeSelector() {
             <ArrowIcon />
           </Link>
           <Link className="selector-card" href="/sriti">
-            <span className="selector-icon">
-              <HemoraIcon name="sunrise" />
-            </span>
+            <HemoraIcon name="hotel-simple" className="selector-property-icon" />
             <span>
               <strong>{properties.sriti.title}</strong>
               <small>Warm city hotel with an atrium heart</small>

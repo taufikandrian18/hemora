@@ -71,8 +71,9 @@ test("uses the supplied HEMORA wordmark and favicon assets", async () => {
   assert.match(markup, /class="loader-beam loader-beam-left"/);
   assert.match(markup, /class="loader-mark"/);
   assert.match(markup, /class="loader-wordmark"/);
-  assert.match(markup, /class="hemora-icon hemora-icon-leaf"/);
-  assert.match(markup, /class="hemora-icon hemora-icon-sunrise"/);
+  assert.match(markup, /class="hemora-icon hemora-icon-hotel-simple selector-property-icon"/);
+  assert.doesNotMatch(markup, /class="selector-icon"/);
+  assert.doesNotMatch(markup, /class="hemora-icon hemora-icon-leaf"|class="hemora-icon hemora-icon-sunrise"/);
   assert.match(layout, /icon: "\/favicon\.png"/);
   assert.match(layout, /shortcut: "\/favicon\.png"/);
   assert.match(layout, /<LoadingScreen className="page-load-transition" \/>/);
@@ -193,8 +194,8 @@ test("keeps the HEMORA brand palette and direct local assets", async () => {
   const loaderBlock = cssBlock(css, ".hemora-loader");
   const loaderMarkBlock = cssBlock(css, ".loader-mark");
   const pageLoadBlock = cssBlock(css, ".page-load-transition");
-  const leafBlock = cssBlock(css, ".hemora-icon-leaf");
-  const sunriseBlock = cssBlock(css, ".hemora-icon-sunrise");
+  const hotelSimpleBlock = cssBlock(css, ".hemora-icon-hotel-simple");
+  const selectorPropertyIconBlock = cssBlock(css, ".selector-card .selector-property-icon");
   const chatBlock = cssBlock(css, ".property-chat-widget");
   const mobileMenuBlock = cssBlock(css, ".mobile-menu");
   const mobileMenuLinkBlock = cssBlock(css, ".property-nav .mobile-menu-panel a");
@@ -221,8 +222,9 @@ test("keeps the HEMORA brand palette and direct local assets", async () => {
   assert.match(loaderBlock, /background:\s*rgb\(14 18 15 \/ 0\.88\);/);
   assert.match(loaderMarkBlock, /icons-light\/hemora-mark\.svg/);
   assert.match(pageLoadBlock, /animation:\s*loaderExit 2\.35s/);
-  assert.match(leafBlock, /\/assets\/hemora\/hemora-icon-library\/icons-light\/leaf\.svg/);
-  assert.match(sunriseBlock, /\/assets\/hemora\/hemora-icon-library\/icons-light\/sunrise\.svg/);
+  assert.match(hotelSimpleBlock, /\/assets\/hemora\/hemora-icon-library\/icons-gold\/hotel-simple\.svg/);
+  assert.match(selectorPropertyIconBlock, /height:\s*clamp\(2\.05rem,\s*3vw,\s*2\.45rem\);/);
+  assert.match(selectorPropertyIconBlock, /width:\s*clamp\(2\.05rem,\s*3vw,\s*2\.45rem\);/);
   assert.match(chatBlock, /border-radius:\s*999px;/);
   assert.match(chatBlock, /width:\s*3\.15rem;/);
   assert.match(mobileMenuBlock, /display:\s*none;/);
