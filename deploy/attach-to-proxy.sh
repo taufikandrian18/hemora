@@ -85,13 +85,16 @@ else:
     lines.insert(target + 1, routes)
     report.append("inserted HEMORA routes at the top of the existing '%s' block (line %d)" % (lines[target].strip(), target + 1))
     # Warn about directives that run before `handle` and could swallow /hemora requests.
+    # Only directives directly in the site block matter; ones nested inside other
+    # handle/route blocks are scoped to those blocks and cannot touch /hemora.
     depth, body = 1, []
     for line in lines[target + 2:]:
+        if depth == 1:
+            body.append(line.strip())
         depth += line.count("{") - line.count("}")
         if depth <= 0:
             break
-        body.append(line.strip())
-    risky = [b for b in body if re.match(r"^(try_files|rewrite|uri|redir|handle_path)\b", b)]
+    risky = [b for b in body if re.match(r"^(try_files|rewrite|uri)\b", b) or re.match(r"^redir\s+\*", b)]
     if risky:
         report.append("WARNING: this block has directives that run before HEMORA's routes and may intercept /hemora: " + "; ".join(risky))
 
