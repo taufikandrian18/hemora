@@ -1,115 +1,126 @@
 # Deploying HEMORA
 
-Production runs on a shared Ubuntu server with Docker. Ports 80/443 there belong to an
-existing Caddy container (`n8n-caddy-1`) that fronts several sites, so HEMORA publishes no
-ports: its container joins that proxy's Docker network and the proxy routes the HEMORA
-domain to it.
+| What | URL |
+|---|---|
+| Website (Next.js) | https://website.taufikandrian.my.id/hemora |
+| WordPress admin (headless CMS) | https://website.taufikandrian.my.id/hemora/wp-admin |
+
+The server is shared. Ports 80/443 belong to an existing Caddy container (`n8n-caddy-1`) that
+already serves `website.taufikandrian.my.id` and other sites, so HEMORA publishes no ports:
 
 ```
 GitHub push to main
   └─ Actions: lint + typecheck + tests
-      └─ build Docker image → ghcr.io/taufikandrian18/hemora:sha-<commit> (+ :latest)
-          └─ SSH to server → /opt/hemora: docker compose pull web && up -d → health check
-Server: n8n-caddy-1 (:80/:443, automatic HTTPS) → hemora-web:3000 (Next.js standalone)
+      └─ build image with NEXT_PUBLIC_BASE_PATH=/hemora → ghcr.io/taufikandrian18/hemora:sha-<commit>
+          └─ SSH → /opt/hemora: docker compose pull web && up -d → health check
+
+n8n-caddy-1 (website.taufikandrian.my.id block, HEMORA routes inserted at the top)
+  ├─ /hemora/wp-admin, wp-login.php, wp-json, wp-content, wp-includes → hemora-wp:80 (WordPress)
+  └─ /hemora, /hemora/*                                              → hemora-web:3000 (Next.js)
+  everything else on the domain → unchanged
+WordPress ↔ MariaDB on a private network (not reachable from outside)
 ```
 
-Files: `Dockerfile`, `deploy/docker-compose.yml`, `deploy/Caddyfile.site`,
-`deploy/attach-to-proxy.sh`, `deploy/bootstrap-server.sh` (fresh servers only),
-`.github/workflows/deploy.yml`.
+Files: `Dockerfile`, `deploy/docker-compose.yml`, `deploy/Caddyfile.routes`,
+`deploy/attach-to-proxy.sh`, `deploy/wordpress/{htaccess,uploads.ini}`,
+`.github/workflows/deploy.yml`. `deploy/bootstrap-server.sh` is only for a fresh server.
 
-## 1. Cloud firewall
+## 1. Server secrets (once, on the server)
 
-The shared proxy already serves 80/443, so nothing new needs opening. Keep SSH (22) open
-for the deploy job.
+```bash
+sudo mkdir -p /opt/hemora/wordpress && sudo chown -R ubuntu:ubuntu /opt/hemora
+cd /opt/hemora
+grep -q '^WP_URL=' .env 2>/dev/null || cat >> .env <<EOF
+WP_URL=https://website.taufikandrian.my.id/hemora
+WP_DB_PASSWORD=$(openssl rand -hex 24)
+WP_DB_ROOT_PASSWORD=$(openssl rand -hex 24)
+EOF
+chmod 600 .env
+```
 
-## 2. Create a deploy key (on your laptop)
+`.env` never leaves the server. Keep a copy of the passwords in your password manager.
+
+## 2. Route the domain to HEMORA (once, from your laptop in the repo)
+
+```bash
+scp deploy/Caddyfile.routes deploy/attach-to-proxy.sh ubuntu@<SERVER_IP>:/opt/hemora/
+ssh -t ubuntu@<SERVER_IP> 'bash /opt/hemora/attach-to-proxy.sh website.taufikandrian.my.id'
+```
+
+The script prints the proxy network, the Caddyfile path and a **diff of the exact change**, then
+asks before applying. It writes `PROXY_NETWORK` to `.env`, backs up the Caddyfile, inserts the
+HEMORA routes between `# BEGIN HEMORA` / `# END HEMORA` at the top of the domain's site block
+(and removes any earlier HEMORA block, e.g. the sslip.io one), validates and reloads Caddy
+gracefully. If validation fails, the backup is restored. If it prints a `WARNING` about
+`try_files` / `rewrite` / `redir` directives, stop and review: those run before HEMORA's routes.
+
+## 3. GitHub secrets
+
+Settings → Secrets and variables → Actions (repository secrets, or secrets of an environment
+named exactly `production`):
+
+| Secret | Value |
+|---|---|
+| `DEPLOY_HOST` | server IP |
+| `DEPLOY_USER` | `ubuntu` |
+| `DEPLOY_SSH_KEY` | private deploy key (`~/.ssh/hemora_deploy`, including BEGIN/END lines) |
+| `DEPLOY_KNOWN_HOSTS` | output of `ssh-keyscan -H <SERVER_IP>` |
+
+Deploy key, if you do not have one yet:
 
 ```bash
 ssh-keygen -t ed25519 -C "hemora-deploy" -f ~/.ssh/hemora_deploy -N ""
 ssh-copy-id -i ~/.ssh/hemora_deploy.pub ubuntu@<SERVER_IP>
-ssh -i ~/.ssh/hemora_deploy ubuntu@<SERVER_IP> 'echo deploy key works'
 ```
 
-## 3. Prepare the server (once)
+## 4. Deploy
 
-On a server that already has Docker (like the current one) skip `bootstrap-server.sh`; just make sure
-`/opt/hemora` exists and belongs to the deploy user:
+Merge to `main` (or **Actions → Deploy → Run workflow**). The deploy job refuses to run until
+`PROXY_NETWORK`, `WP_URL`, `WP_DB_PASSWORD` and `WP_DB_ROOT_PASSWORD` exist in `/opt/hemora/.env`.
+The first run also starts WordPress and MariaDB.
+
+## 5. Install WordPress (once, right after the first deploy)
+
+The web installer (`wp-admin/install.php`) is deliberately blocked at the proxy so nobody can
+claim the fresh install. Install from the server with WP-CLI instead:
 
 ```bash
-sudo mkdir -p /opt/hemora && sudo chown ubuntu:ubuntu /opt/hemora
+cd /opt/hemora
+docker compose run --rm wpcli wp core install \
+  --url="https://website.taufikandrian.my.id/hemora" \
+  --title="HEMORA" \
+  --admin_user="<choose a username, not 'admin'>" \
+  --admin_email="<your email>" \
+  --skip-email --prompt=admin_password     # asks for the password, keeps it out of shell history
+docker compose run --rm wpcli wp rewrite structure '/%postname%/'
 ```
 
-Then, from your laptop in the repo, copy the proxy files and attach HEMORA to the shared Caddy:
-
-```bash
-scp deploy/Caddyfile.site deploy/attach-to-proxy.sh ubuntu@<SERVER_IP>:/opt/hemora/
-ssh -t ubuntu@<SERVER_IP> 'bash /opt/hemora/attach-to-proxy.sh "hemora.<SERVER_IP>.sslip.io"'
-```
-
-The script finds the proxy's network and Caddyfile, writes `PROXY_NETWORK` to `/opt/hemora/.env`,
-backs up the Caddyfile, adds a `# BEGIN HEMORA … # END HEMORA` block, validates it and reloads Caddy
-gracefully. If validation fails it restores the backup, so the other sites are never affected.
-`hemora.<SERVER_IP>.sslip.io` is a free wildcard DNS name for the server IP, good until a real domain
-exists; Caddy still issues an HTTPS certificate for it.
-
-## 4. Add GitHub secrets
-
-Repository → Settings → Secrets and variables → Actions → New repository secret (or as secrets of an
-environment named exactly `production`, which the deploy job uses):
-
-| Secret | Value |
-|---|---|
-| `DEPLOY_HOST` | server IP (or hostname) |
-| `DEPLOY_USER` | `ubuntu` |
-| `DEPLOY_SSH_KEY` | contents of `~/.ssh/hemora_deploy` (the **private** key, including the BEGIN/END lines) |
-| `DEPLOY_KNOWN_HOSTS` | output of `ssh-keyscan -H <SERVER_IP>` |
-
-With the GitHub CLI instead:
-
-```bash
-gh secret set DEPLOY_HOST --body "<SERVER_IP>"
-gh secret set DEPLOY_USER --body "ubuntu"
-gh secret set DEPLOY_SSH_KEY < ~/.ssh/hemora_deploy
-ssh-keyscan -H <SERVER_IP> | gh secret set DEPLOY_KNOWN_HOSTS
-```
-
-The container image is private on GHCR; the workflow logs the server in with the run's short-lived
-`GITHUB_TOKEN` for the pull and logs out afterwards, so no long-lived registry token is stored.
-
-## 5. Deploy
-
-Merge to `main` (or run **Actions → Deploy → Run workflow** once the workflow exists on `main`).
-When the run is green, open `https://hemora.<SERVER_IP>.sslip.io`.
-
-## 6. Switch to a real domain
-
-1. Create DNS `A` records for the domain (and `www`) pointing to the server IP.
-2. Re-run the attach script with the new address (it replaces the HEMORA block):
-   ```bash
-   ssh -t ubuntu@<SERVER_IP> 'bash /opt/hemora/attach-to-proxy.sh "hemora.id, www.hemora.id"'
-   docker logs -f n8n-caddy-1   # on the server: watch the certificate being issued
-   ```
+Then sign in at https://website.taufikandrian.my.id/hemora/wp-admin.
 
 ## Operations
 
 ```bash
 cd /opt/hemora
-docker compose ps                     # status + health
-docker compose logs -f --tail=100 web # app logs
-docker compose restart web
+docker compose ps                        # status + health of web, wordpress, db
+docker compose logs -f --tail=100 web    # Next.js logs
+docker compose logs -f --tail=100 wordpress
+docker compose run --rm wpcli wp plugin list
 
-# Roll back to an earlier release (tags are sha-<7 char commit>, see GitHub → Packages):
+# Roll back the website to an earlier release (tags: sha-<7 char commit>, see GitHub → Packages)
 sed -i 's#^WEB_IMAGE=.*#WEB_IMAGE=ghcr.io/taufikandrian18/hemora:sha-XXXXXXX#' .env
-docker compose pull web && docker compose up -d
+docker compose up -d web
+
+# Database backup (store it off the server)
+docker compose exec -T db sh -c 'mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" hemora' | gzip > ~/hemora-db-$(date +%F).sql.gz
 ```
 
-A private image needs a registry login for manual pulls:
-`echo <PAT with read:packages> | docker login ghcr.io -u taufikandrian18 --password-stdin`.
+Remove HEMORA from the proxy: delete the lines between `# BEGIN HEMORA` and `# END HEMORA` in
+the proxy Caddyfile, then `docker exec n8n-caddy-1 caddy reload --config /etc/caddy/Caddyfile`.
 
 ## Local checks before pushing
 
 ```bash
 npm run lint && npx tsc --noEmit -p . && npm test
-docker build -t hemora:local . && docker run --rm -p 3000:3000 hemora:local
-curl localhost:3000/api/health
+docker build --build-arg NEXT_PUBLIC_BASE_PATH=/hemora -t hemora:local .
+docker run --rm -p 3000:3000 hemora:local   # then open http://localhost:3000/hemora
 ```

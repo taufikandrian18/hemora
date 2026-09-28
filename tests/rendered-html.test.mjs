@@ -78,8 +78,18 @@ test("uses the supplied HEMORA wordmark and favicon assets", async () => {
   assert.match(markup, /class="hemora-icon hemora-icon-hotel-simple selector-property-icon"/);
   assert.doesNotMatch(markup, /class="selector-icon"/);
   assert.doesNotMatch(markup, /class="hemora-icon hemora-icon-leaf"|class="hemora-icon hemora-icon-sunrise"/);
-  assert.match(layout, /icon: "\/favicon\.png"/);
-  assert.match(layout, /shortcut: "\/favicon\.png"/);
+  assert.match(layout, /icon: asset\("\/favicon\.png"\)/);
+  assert.match(layout, /shortcut: asset\("\/favicon\.png"\)/);
+
+  // Sub-path deployment (/hemora): Next basePath, asset() for plain URLs, CSS url() prefixing.
+  const nextConfig = await readFile(new URL("../next.config.ts", import.meta.url), "utf8");
+  const postcssConfig = await readFile(new URL("../postcss.config.mjs", import.meta.url), "utf8");
+  const basePathHelper = await readFile(new URL("../app/base-path.ts", import.meta.url), "utf8");
+  assert.match(nextConfig, /basePath: process\.env\.NEXT_PUBLIC_BASE_PATH/);
+  assert.match(postcssConfig, /prefix-css-urls\.cjs/);
+  assert.match(basePathHelper, /export function asset\(/);
+  // Without NEXT_PUBLIC_BASE_PATH (tests, local dev) assets stay at the root.
+  assert.match(markup, /src="\/assets\/hemora\/hemora-logo\.png"/);
   assert.match(layout, /<LoadingScreen className="page-load-transition" \/>/);
   assert.match(layout, /<PageTransition \/>/);
   assert.match(layout, /<MotionEffects \/>/);

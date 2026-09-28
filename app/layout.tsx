@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { asset } from "./base-path";
 import { LoadingScreen } from "./loading-screen";
 import { MotionEffects } from "./motion";
 import { PageTransition } from "./page-transition";
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
   description:
     "A calm, image-led hospitality homepage for HEMORA's two-property ecosystem in Ciwidey and Palu.",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
+    icon: asset("/favicon.png"),
+    shortcut: asset("/favicon.png"),
   },
 };
 

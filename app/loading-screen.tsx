@@ -2,6 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element -- The loader uses the existing transparent wordmark asset; Vinext local assets are not wired through next/image. */
 
+import { asset } from "./base-path";
+
 type LoadingScreenProps = {
   className?: string;
   label?: string;
@@ -14,7 +16,7 @@ export function LoadingScreen({ className, label }: LoadingScreenProps) {
         <span className="loader-beam loader-beam-left" />
         <span className="loader-beam loader-beam-right" />
         <span className="loader-mark" />
-        <img className="loader-wordmark" src="/assets/hemora/hemora-logo.png" alt="" width={920} height={167} />
+        <img className="loader-wordmark" src={asset("/assets/hemora/hemora-logo.png")} alt="" width={920} height={167} />
       </div>
       {label ? <span className="sr-only">{label}</span> : null}
     </div>

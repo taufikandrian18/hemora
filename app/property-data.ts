@@ -1,3 +1,5 @@
+import { withAssetBase } from "./base-path";
+
 export type PropertySlug = "lereng" | "sriti";
 export type MenuSlug = "stay" | "dining" | "wellness" | "journal";
 
@@ -89,7 +91,7 @@ export const menuSections: { slug: MenuSlug; label: string }[] = [
   { slug: "journal", label: "Journal" },
 ];
 
-export const properties: Record<PropertySlug, PropertyData> = {
+const propertyContent: Record<PropertySlug, PropertyData> = {
   lereng: {
     slug: "lereng",
     title: "Lereng Senja, Ciwidey",
@@ -509,6 +511,8 @@ export const properties: Record<PropertySlug, PropertyData> = {
     phone: "+62 812 3456 7890",
   },
 };
+
+export const properties = withAssetBase(propertyContent);
 
 export const bookingBaseUrl = "https://moraclub.moragroup.id/product";
 
