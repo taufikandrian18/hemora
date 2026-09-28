@@ -45,6 +45,17 @@ export type PropertyData = {
   heroPoster: string;
   heroAlt: string;
   selectorLine: string;
+  /** Lines of the oversized hero wordmark. */
+  wordmark: string[];
+  coordinates: string;
+  timeZone: string;
+  timeZoneLabel: string;
+  /**
+   * Mora Club (moraclub.moragroup.id) STAAH property id. Mora Club currently lists both
+   * HEMORA hotels as "Opening Soon" without an id, so reservations land on the Mora Club
+   * search with dates and guests only. Fill this in once Mora Club publishes the id.
+   */
+  bookingPropertyId: string | null;
   heroKicker: string;
   heroTitle: string;
   heroEmphasis: string;
@@ -89,6 +100,11 @@ export const properties: Record<PropertySlug, PropertyData> = {
     heroVideo: "/assets/hemora/hemora-hero.mp4",
     heroPoster: "/assets/hemora/lereng/hero.png",
     selectorLine: "Highland retreat above tea slopes",
+    wordmark: ["Lereng", "Senja"],
+    coordinates: "7.1° S · 107.4° E",
+    timeZone: "Asia/Jakarta",
+    timeZoneLabel: "WIB",
+    bookingPropertyId: null,
     heroAlt: "Lereng Senja resort surrounded by tea slopes and morning mist",
     heroKicker: "Ciwidey, West Java · 1,450m above sea level",
     heroTitle: "Highland rooms",
@@ -276,7 +292,7 @@ export const properties: Record<PropertySlug, PropertyData> = {
     quoteSource: "Guest note · Ciwidey stay",
     bookingTitle: "Your highland room is waiting.",
     bookingLead:
-      "Write to the host team with your dates and preferred room. We will answer with availability and the simplest booking path.",
+      "Choose your dates and party size. We carry them straight to Mora Club, the Mora Group reservation portal, for live availability and secure booking.",
     bookingImage: "/assets/hemora/lereng/hero.png",
     bookingAlt: "Misted highland terraces around Lereng Senja",
     address: "Ciwidey, Bandung Regency, West Java",
@@ -293,6 +309,11 @@ export const properties: Record<PropertySlug, PropertyData> = {
     heroVideo: "/assets/hemora/sriti/hero.mp4",
     heroPoster: "/assets/hemora/sriti/hero-poster.jpg",
     selectorLine: "Warm city hotel with an atrium heart",
+    wordmark: ["Sriti", "Palu"],
+    coordinates: "0.9° S · 119.9° E",
+    timeZone: "Asia/Makassar",
+    timeZoneLabel: "WITA",
+    bookingPropertyId: null,
     heroAlt: "Sriti Palu sculptural staircase and atrium lounge",
     heroKicker: "Palu, Central Sulawesi · City hospitality",
     heroTitle: "A warmer city",
@@ -480,14 +501,16 @@ export const properties: Record<PropertySlug, PropertyData> = {
     quoteSource: "Guest note · Palu stay",
     bookingTitle: "Your city room is waiting.",
     bookingLead:
-      "Send the host team your dates, guest count, and arrival time. We will confirm the most practical room and dining plan.",
+      "Choose your dates and party size. We carry them straight to Mora Club, the Mora Group reservation portal, for live availability and secure booking.",
     bookingImage: "/assets/hemora/sriti/hero.png",
     bookingAlt: "Sriti Palu atrium staircase",
-    address: "Palu, Central Sulawesi",
+    address: "Jl. Durian No. 88, Kamonji, Palu Barat, Kota Palu, Sulawesi Tengah 94111",
     email: "hello@hemora.co",
     phone: "+62 812 3456 7890",
   },
 };
+
+export const bookingBaseUrl = "https://moraclub.moragroup.id/product";
 
 export function getSiblingProperty(property: PropertyData) {
   return properties[property.slug === "lereng" ? "sriti" : "lereng"];
