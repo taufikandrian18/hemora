@@ -29,6 +29,9 @@ x-wp-env: &wp-env
     define('WP_POST_REVISIONS', 10);
     define('WP_MEMORY_LIMIT', '128M');
     define('WP_ENVIRONMENT_TYPE', 'production');
+  # Lets the hemora-content mu-plugin refresh the website right after an edit.
+  HEMORA_REVALIDATE_URL: http://hemora-web:3000/hemora/api/revalidate
+  HEMORA_REVALIDATE_SECRET: ${REVALIDATE_SECRET:?Set REVALIDATE_SECRET in /opt/hemora/.env}
 
 services:
   web:
@@ -38,6 +41,9 @@ services:
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: 0.0.0.0
+      # Headless WordPress, reached over the shared Docker network (see app/cms.ts).
+      WP_API_URL: http://hemora-wp/hemora
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:?Set REVALIDATE_SECRET in /opt/hemora/.env}
     expose:
       - "3000"
     networks:
@@ -63,6 +69,7 @@ services:
       - wp_data:/var/www/html
       - ./wordpress/htaccess:/var/www/html/hemora/.htaccess:ro
       - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/hemora-uploads.ini:ro
+      - ./wordpress/mu-plugins:/var/www/html/hemora/wp-content/mu-plugins:ro
     depends_on:
       db:
         condition: service_healthy
@@ -110,11 +117,13 @@ services:
       HOME: /tmp
     volumes:
       - wp_data:/var/www/html
+      - ./wordpress/mu-plugins:/var/www/html/hemora/wp-content/mu-plugins:ro
     depends_on:
       db:
         condition: service_healthy
     networks:
       - internal
+      - proxy
 
 networks:
   internal:

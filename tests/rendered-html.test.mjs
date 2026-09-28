@@ -216,6 +216,21 @@ test("renders every property menu page as its own route", async () => {
   }
 });
 
+test("exposes built-in content for the WordPress import and guards the refresh hook", async () => {
+  const defaults = await render("/api/content/defaults");
+  assert.equal(defaults.status, 200);
+  const body = await defaults.json();
+  assert.deepEqual(Object.keys(body.properties).sort(), ["lereng", "sriti"]);
+  assert.equal(body.properties.lereng.sections.stay.details.length, 3);
+
+  const cms = await readFile(new URL("../app/cms.ts", import.meta.url), "utf8");
+  const plugin = await readFile(new URL("../deploy/wordpress/mu-plugins/hemora-content.php", import.meta.url), "utf8");
+  assert.match(cms, /acf_format=standard/);
+  assert.match(cms, /unstable_cache\(loadAllProperties/);
+  assert.match(plugin, /'rest_base'\s*=>\s*'hemora-properties'/);
+  assert.match(plugin, /WP_CLI::add_command\('hemora seed'/);
+});
+
 test("keeps the HEMORA brand palette and direct local assets", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");

@@ -84,9 +84,10 @@ jobs:
         env:
           TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
         run: |
-          ssh -i ~/.ssh/deploy_key "$TARGET" 'mkdir -p /opt/hemora/wordpress'
+          ssh -i ~/.ssh/deploy_key "$TARGET" 'mkdir -p /opt/hemora/wordpress/mu-plugins'
           scp -i ~/.ssh/deploy_key deploy/docker-compose.yml deploy/Caddyfile.routes deploy/attach-to-proxy.sh "$TARGET:/opt/hemora/"
           scp -i ~/.ssh/deploy_key deploy/wordpress/htaccess deploy/wordpress/uploads.ini "$TARGET:/opt/hemora/wordpress/"
+          scp -i ~/.ssh/deploy_key deploy/wordpress/mu-plugins/*.php "$TARGET:/opt/hemora/wordpress/mu-plugins/"
 
       - name: Pull and restart
         env:
@@ -99,7 +100,7 @@ jobs:
             "WEB_IMAGE='$WEB_IMAGE' GHCR_USER='$GHCR_USER' GHCR_TOKEN='$GHCR_TOKEN' bash -s" <<'REMOTE'
           set -euo pipefail
           cd /opt/hemora
-          for key in PROXY_NETWORK WP_URL WP_DB_PASSWORD WP_DB_ROOT_PASSWORD; do
+          for key in PROXY_NETWORK WP_URL WP_DB_PASSWORD WP_DB_ROOT_PASSWORD REVALIDATE_SECRET; do
             grep -q "^$key=" .env || { echo "$key missing in /opt/hemora/.env - see docs/DEPLOYMENT.md." >&2; exit 1; }
           done
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
@@ -111,6 +112,11 @@ jobs:
           for attempt in $(seq 1 30); do
             if docker compose exec -T web sh -c 'wget -qO- "http://127.0.0.1:3000${NEXT_PUBLIC_BASE_PATH}/api/health"' >/dev/null 2>&1; then
               echo "Healthy: $WEB_IMAGE"
+              # Pages are prerendered with built-in copy in CI; pull WordPress content in now.
+              docker compose exec -T web sh -c 'wget -qO- --post-data="" --header="x-hemora-secret: $REVALIDATE_SECRET" "http://127.0.0.1:3000${NEXT_PUBLIC_BASE_PATH}/api/revalidate"' >/dev/null 2>&1 || echo "Content refresh skipped"
+              for path in "" /lereng /sriti; do
+                docker compose exec -T web sh -c "wget -qO- \"http://127.0.0.1:3000\${NEXT_PUBLIC_BASE_PATH}$path\"" >/dev/null 2>&1 || true
+              done
               # Shared server: prune only superseded HEMORA images, never other projects'.
               docker image prune -f --filter "label=org.opencontainers.image.source=https://github.com/taufikandrian18/hemora" >/dev/null
               exit 0

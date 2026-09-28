@@ -516,15 +516,7 @@ export const properties = withAssetBase(propertyContent);
 
 export const bookingBaseUrl = "https://moraclub.moragroup.id/product";
 
-export function getSiblingProperty(property: PropertyData) {
-  return properties[property.slug === "lereng" ? "sriti" : "lereng"];
-}
-
 export const propertySlugs = Object.keys(properties) as PropertySlug[];
-
-export function getProperty(slug: string) {
-  return properties[slug as PropertySlug];
-}
 
 export function getPropertySection(property: PropertyData, section: string) {
   return property.sections[section as MenuSlug];
