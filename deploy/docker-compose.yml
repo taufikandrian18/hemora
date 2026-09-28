@@ -1,6 +1,34 @@
-# Production stack on the server (/opt/hemora). The deploy workflow copies this file
-# and the Caddyfile to the server, then runs `docker compose pull web && docker compose up -d`.
+# HEMORA production stack (/opt/hemora on the server).
+#
+# The server already runs a shared Caddy reverse proxy (n8n-caddy-1) that owns ports 80/443,
+# so nothing here publishes ports. "web" (Next.js) and "wordpress" join that proxy's Docker
+# network (PROXY_NETWORK) as hemora-web / hemora-wp; the proxy routes
+#   https://website.taufikandrian.my.id/hemora/wp-admin|wp-json|wp-content|...  -> hemora-wp:80
+#   https://website.taufikandrian.my.id/hemora/...                             -> hemora-web:3000
+# (see deploy/Caddyfile.routes and deploy/attach-to-proxy.sh). The database stays on a
+# private network.
 name: hemora
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-wp-env: &wp-env
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_NAME: hemora
+  WORDPRESS_DB_USER: hemora
+  WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD:?Set WP_DB_PASSWORD in /opt/hemora/.env}
+  WORDPRESS_TABLE_PREFIX: wp_
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_HOME', '${WP_URL:?Set WP_URL in /opt/hemora/.env}');
+    define('WP_SITEURL', '${WP_URL}');
+    define('FORCE_SSL_ADMIN', true);
+    define('DISALLOW_FILE_EDIT', true);
+    define('WP_POST_REVISIONS', 10);
+    define('WP_MEMORY_LIMIT', '128M');
+    define('WP_ENVIRONMENT_TYPE', 'production');
 
 services:
   web:
@@ -12,36 +40,88 @@ services:
       HOSTNAME: 0.0.0.0
     expose:
       - "3000"
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+    networks:
+      proxy:
+        aliases:
+          - hemora-web
+    mem_limit: 384m
+    logging: *logging
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- \"http://127.0.0.1:3000$${NEXT_PUBLIC_BASE_PATH}/api/health\" >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       start_period: 20s
       retries: 3
 
-  caddy:
-    image: caddy:2-alpine
+  wordpress:
+    image: wordpress:6.8-php8.3-apache
     restart: unless-stopped
-    depends_on:
-      - web
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    environment:
-      # ":80" serves plain HTTP on the IP. Set a domain (e.g. "hemora.id, www.hemora.id")
-      # in /opt/hemora/.env and Caddy obtains HTTPS certificates automatically.
-      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    # Installs WordPress into /var/www/html/hemora so it natively answers /hemora/wp-admin.
+    working_dir: /var/www/html/hemora
+    environment: *wp-env
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - wp_data:/var/www/html
+      - ./wordpress/htaccess:/var/www/html/hemora/.htaccess:ro
+      - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/hemora-uploads.ini:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      internal:
+      proxy:
+        aliases:
+          - hemora-wp
+    mem_limit: 320m
+    logging: *logging
+
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --performance-schema=OFF
+      - --max-connections=40
+    environment:
+      MARIADB_DATABASE: hemora
+      MARIADB_USER: hemora
+      MARIADB_PASSWORD: ${WP_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${WP_DB_ROOT_PASSWORD:?Set WP_DB_ROOT_PASSWORD in /opt/hemora/.env}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - internal
+    mem_limit: 256m
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
+  # One-off admin commands, e.g.:  docker compose run --rm wpcli wp core install ...
+  wpcli:
+    image: wordpress:cli-php8.3
+    profiles: ["tools"]
+    user: "33:33"
+    working_dir: /var/www/html/hemora
+    environment:
+      <<: *wp-env
+      HOME: /tmp
+    volumes:
+      - wp_data:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+networks:
+  internal:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?Set PROXY_NETWORK in /opt/hemora/.env (run attach-to-proxy.sh)}
 
 volumes:
-  caddy_data:
-  caddy_config:
+  wp_data:
+  db_data:

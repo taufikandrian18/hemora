@@ -3,6 +3,7 @@ import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
 import { bookingBaseUrl, getSiblingProperty, menuSections, properties, propertySlugs, type MenuSlug, type PropertyData, type PropertySection } from "./property-data";
 import { BookingForm, LocalTime, SliderControls } from "./motion";
+import { asset } from "./base-path";
 
 type HemoraIconName = "arrow-left" | "arrow-right" | "ballroom" | "bar" | "close" | "dining" | "hotel-simple" | "leaf" | "menu" | "phone" | "spa" | "sunrise";
 
@@ -101,7 +102,7 @@ function IconStats({ property, className, itemClassName }: { property: PropertyD
 function BrandLockup({ compact = false, href = "/" }: { compact?: boolean; href?: string }) {
   return (
     <Link className={compact ? "brand-lockup compact" : "brand-lockup"} href={href}>
-      <img className="brand-logo" src="/assets/hemora/hemora-logo.png" alt="HEMORA" width={920} height={167} />
+      <img className="brand-logo" src={asset("/assets/hemora/hemora-logo.png")} alt="HEMORA" width={920} height={167} />
     </Link>
   );
 }

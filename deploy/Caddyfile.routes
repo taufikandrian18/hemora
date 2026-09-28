@@ -1,0 +1,23 @@
+	# BEGIN HEMORA
+	# Managed by /opt/hemora/attach-to-proxy.sh - edits inside these markers are replaced.
+	# WordPress (headless CMS) answers only its admin, API and media paths. The web
+	# installer, uploads-as-PHP and anything else under /hemora go to Next.js instead.
+	@hemora_wp {
+		path /hemora/wp-admin /hemora/wp-admin/* /hemora/wp-login.php /hemora/wp-json /hemora/wp-json/* /hemora/wp-content/* /hemora/wp-includes/* /hemora/wp-cron.php /hemora/index.php
+		not path /hemora/wp-admin/install.php /hemora/wp-admin/setup-config.php /hemora/wp-content/uploads/*.php
+	}
+	handle @hemora_wp {
+		reverse_proxy hemora-wp:80
+	}
+
+	@hemora_web path /hemora /hemora/*
+	handle @hemora_web {
+		encode zstd gzip
+		@hemora_hashed path /hemora/_next/static/*
+		header @hemora_hashed >Cache-Control "public, max-age=31536000, immutable"
+		@hemora_assets path /hemora/assets/* /hemora/favicon.png /hemora/favicon.svg
+		header @hemora_assets >Cache-Control "public, max-age=604800"
+		header X-Content-Type-Options "nosniff"
+		reverse_proxy hemora-web:3000
+	}
+	# END HEMORA

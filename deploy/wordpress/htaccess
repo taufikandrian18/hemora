@@ -1,0 +1,13 @@
+# WordPress installed in the /hemora/ sub-directory (headless: only wp-admin, wp-json and
+# media are routed here by the proxy). Mounted read-only; WordPress cannot rewrite it.
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /hemora/
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /hemora/index.php [L]
+</IfModule>
+# END WordPress
