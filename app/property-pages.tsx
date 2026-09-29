@@ -275,14 +275,18 @@ function Footer({ property, collection }: { property: PropertyData; collection: 
 /** Oversized property name; each letter rises in sequence. */
 function HeroWordmark({ lines }: { lines: string[] }) {
   let index = 0;
+  const longest = Math.max(...lines.map((line) => Array.from(line).length), 1);
 
+  // Each line is a no-wrap flex row, so a name can never break mid-word (iOS Safari
+  // wrapped between the per-letter inline-blocks). --chars lets small screens shrink
+  // long names to fit. Screen readers get the name once, not letter by letter.
   return (
-    <h1 className="hero-wordmark">
+    <h1 className="hero-wordmark" aria-label={lines.join(" ")} style={cssVars({ "--chars": longest })}>
       {lines.map((line) => (
-        <span className="hero-wordmark-line" key={line}>
+        <span className="hero-wordmark-line" key={line} aria-hidden="true">
           {Array.from(line).map((letter, position) => (
             <span className="letter" key={`${letter}-${position}`} style={cssVars({ "--i": index++ })}>
-              {letter}
+              {letter === " " ? "\u00a0" : letter}
             </span>
           ))}
         </span>

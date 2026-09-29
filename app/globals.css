@@ -1175,7 +1175,8 @@ figure {
 }
 
 .hero-wordmark-line {
-  display: block;
+  display: flex;
+  flex-wrap: nowrap;
   overflow: hidden;
   padding-bottom: 0.2em;
 }
@@ -1183,7 +1184,8 @@ figure {
 .hero-wordmark .letter {
   animation: letterRise 1.25s var(--ease-out) both;
   animation-delay: calc(var(--intro-delay) + var(--i, 0) * 45ms);
-  display: inline-block;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .hero-sriti .hero-frame {
@@ -2920,10 +2922,13 @@ figure {
     align-items: flex-start;
     align-self: end;
     flex-direction: column;
-    font-size: 21vw;
+    /* As large as the taste calls for, but the longest line always fits the frame. */
+    font-size: min(21vw, calc(84vw / (var(--chars, 6) * 0.62)));
     gap: 0;
     grid-column: 1;
     grid-row: 3;
+    letter-spacing: -0.03em;
+    line-height: 0.86;
   }
 
   .hero-aside,
