@@ -124,7 +124,7 @@ test("renders Lereng and Sriti as separate property pages using the reference la
     assert.match(markup, new RegExp(`class="hero-stage hero-${slug}" id="top"`));
     assert.match(markup, /class="hero-frame"/);
     assert.match(markup, /<video class="hero-media"/);
-    assert.match(markup, /<h1 class="hero-wordmark"><span class="hero-wordmark-line"><span class="letter"/);
+    assert.match(markup, /<h1 class="hero-wordmark" aria-label="[^"]+" style="--chars:\d+"><span class="hero-wordmark-line" aria-hidden="true"><span class="letter"/);
     assert.match(markup, /class="hero-tagline words-rise"/);
     assert.match(markup, /class="local-time"/);
     assert.match(markup, /class="pill-cta" href="#book"/);
